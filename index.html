@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ecemiko — Olabilecek en harika uygulama</title>
+    <meta name="description"
+        content="Ecemiko ile oyun deneyimini bir üst seviyeye taşı. Premium launcher, benzersiz tasarım." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style.css?v=3" />
+</head>
+
+<body>
+
+    <!-- Custom Cursor -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
+    <!-- Noise Overlay -->
+    <div class="noise-overlay"></div>
+
+    <!-- NAV -->
+    <nav id="navbar">
+        <div class="nav-inner">
+            <div class="nav-logo">
+                <span class="logo-text">ECEMIKO</span>
+                <div class="logo-dot"></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#hero" class="nav-link">Ana Sayfa</a></li>
+                <li><a href="#features" class="nav-link">Özellikler</a></li>
+                <li><a href="#download" class="nav-link">İndir</a></li>
+            </ul>
+            <div class="nav-cta">
+                <a href="#download" class="btn-nav">İndir</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===================== HERO ===================== -->
+    <section id="hero">
+        <div class="hero-bg-grid"></div>
+        <div class="hero-content">
+            <div class="hero-eyebrow">
+                <span class="eyebrow-line"></span>
+                <span class="eyebrow-text">MADE OF ECEMİKO</span>
+                <span class="eyebrow-line"></span>
+            </div>
+            <h1 class="hero-title">
+                <span class="title-line" data-text="ECEMİKO">ECEMİKO</span>
+            </h1>
+            <p class="hero-subtitle">Aldığın 1 oyundan fazlasını veren<br />benzersiz launcher uygulaması
+            </p>
+            <div class="hero-cta-group">
+                <a href="#download" class="btn-primary" id="hero-download-btn">
+                    <span class="btn-text">Hemen İndir</span>
+                    <span class="btn-arrow">→</span>
+                    <div class="btn-glow"></div>
+                </a>
+                <a href="#features" class="btn-ghost">Keşfet</a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-num" data-count="1">1</span>
+                    <span class="stat-plus">+</span>
+                    <span class="stat-label">Kullanıcı</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-num" data-count="64 Bin">0</span>
+                    <span class="stat-plus">Bin+</span>
+                    <span class="stat-label">Oyun</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-num" data-count="100">0</span>
+                    <span class="stat-plus">%</span>
+                    <span class="stat-label">Memnuniyet</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-scroll-hint">
+            <div class="scroll-hint-line"></div>
+            <span>Kaydır</span>
+        </div>
+        <!-- Floating UI mockup -->
+        <div class="hero-float-card">
+            <div class="float-card-inner">
+                <div class="float-card-dot active"></div>
+                <div class="float-card-dot"></div>
+                <div class="float-card-dot"></div>
+                <span class="float-card-label">LIVE</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SCROLL ANIMATION SECTION ===================== -->
+    <section id="scroll-animation-section">
+
+        <!-- Full-screen sticky canvas layer -->
+        <div id="canvas-sticky">
+
+            <!-- The frame canvas -->
+            <canvas id="scroll-canvas"></canvas>
+
+            <!-- Dark gradient blends that connect to sections above/below -->
+            <div class="canvas-fade canvas-fade--top"></div>
+            <div class="canvas-fade canvas-fade--bottom"></div>
+
+            <!-- Subtle vignette -->
+            <div class="canvas-vignette"></div>
+
+            <!-- Progress rail — right edge -->
+            <div class="scroll-progress-rail">
+                <div class="scroll-progress-line" id="scroll-progress-line"></div>
+                <div class="scroll-progress-dot" id="scroll-progress-dot"></div>
+            </div>
+
+            <!-- Frame counter — bottom left -->
+            <div class="frame-counter">
+                <span id="frame-counter-num">001</span>
+                <span class="frame-counter-slash">/</span>
+                <span class="frame-counter-total">093</span>
+            </div>
+
+            <!-- ── CHAPTER 1  (frames 1–41 → scroll 0–0.44) ── -->
+            <div class="story-panel story-panel--left" id="story-1" data-from="0" data-to="0.44">
+                <div class="story-panel-inner">
+                    <div class="story-chapter">CH. 01</div>
+                    <h2 class="story-heading">
+                        Oyunun Tadını<br /><em>Çıkar</em>
+                    </h2>
+                    <p class="story-body">Her bir AppID, Her bir oyun. Ecemiko ile oyunun içine gir.</p>
+                    <div class="story-line"></div>
+                </div>
+            </div>
+
+            <!-- ── CHAPTER 2  (frames 36–67 → scroll 0.38–0.72) ── -->
+            <div class="story-panel story-panel--right" id="story-2" data-from="0.38" data-to="0.72">
+                <div class="story-panel-inner">
+                    <div class="story-chapter">CH. 02</div>
+                    <h2 class="story-heading">
+                        Steamın verdiği limitleri<br /><em>Aş</em>
+                    </h2>
+                    <p class="story-body">Ultra hız, kesintisiz deneyim. Rakipler geride kalır.</p>
+                    <div class="story-line"></div>
+                </div>
+            </div>
+
+            <!-- ── CHAPTER 3  (frames 62–93 → scroll 0.66–1.0) ── -->
+            <div class="story-panel story-panel--center" id="story-3" data-from="0.66" data-to="1">
+                <div class="story-panel-inner">
+                    <div class="story-chapter">CH. 03</div>
+                    <h2 class="story-heading">
+                        Hazır<br /><em>mısın?</em>
+                    </h2>
+                    <p class="story-body">Ecemiko seni bekliyor. Oyun şimdi başlıyor.</p>
+                    <a href="#download" class="story-btn">İndir →</a>
+                    <div class="story-line"></div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===================== SSS (FAQ) SECTİON ===================== -->
+    <section id="faq-section" class="reveal">
+        <div class="faq-container">
+            <div class="faq-header">
+                <div class="section-badge">MERAK EDİLENLER</div>
+                <h2 class="section-title">Aklında Sorular mı Var?</h2>
+                <p class="section-desc">Ecemiko ile ilgili tüm detaylar burada.</p>
+            </div>
+
+            <div class="faq-list">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Ecemiko'yu indirmek ücretli mi?</span>
+                        <div class="faq-icon">+</div>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Evet, olabilecek en uygun fiyatlı şekilde herkesin erişebileceği kadar uygun! Uygulamayı
+                            sitemizden indirip verilen kod ile hemen kullanmaya başlayabilirsin.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Sistem gereksinimleri nelerdir?</span>
+                        <div class="faq-icon">+</div>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Windows 10 ve üzeri işletim sistemlerinde sorunsuzca çalışır. Ecemiko, cihazını yormayacak
+                            ultra hafif bir mimari ile kodlanmıştır.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Güncellemeler otomatik mi yapılıyor?</span>
+                        <div class="faq-icon">+</div>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Evet, kendi geliştirdiğimiz akıllı güncelleme sistemi sayesinde yeni bir sürüm
+                            yayınlandığında uygulama saniyeler içinde arka planda güncellenir.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Güvenlik konusunda ne kadar iddialısınız?</span>
+                        <div class="faq-icon">+</div>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Tüm bağlantılarımız uçtan uca şifrelidir ve verilerin hiçbir zaman üçüncü taraflarla
+                            paylaşılmaz. Sistem bir banka güvenliği kadar yoğun güvenlik içindedir. Senin güvenliğin her
+                            şeyden önce gelir.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FEATURES ===================== -->
+    <section id="features">
+        <div class="section-header">
+            <div class="section-badge">ÖZELLİKLER</div>
+            <h2 class="section-title">Neden <span class="highlight">Ecemiko</span>?</h2>
+            <p class="section-desc">Rakiplerinden sıyrılan, seni farklı kılan özellikler</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card" data-index="0">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 48 48" fill="none">
+                        <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2" />
+                        <path d="M16 24l6 6 10-12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <h3>Ultra Hız</h3>
+                <p>Sıfır gecikme, anlık yanıt. Performansın zirvesini yaşa.</p>
+                <div class="feature-card-line"></div>
+            </div>
+            <div class="feature-card feature-card--highlight" data-index="1">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 48 48" fill="none">
+                        <path d="M24 4l6 14h14l-11 8.5 4 14L24 32l-13 8.5 4-14L4 18h14z" stroke="currentColor"
+                            stroke-width="2" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <h3>Premium Tasarım</h3>
+                <p>Her piksel özenle tasarlandı. Görsel şölen seni bekliyor.</p>
+                <div class="feature-card-line"></div>
+            </div>
+            <div class="feature-card" data-index="2">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 48 48" fill="none">
+                        <rect x="8" y="12" width="32" height="24" rx="4" stroke="currentColor" stroke-width="2" />
+                        <path d="M19 24h10M24 19v10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+                    </svg>
+                </div>
+                <h3>Sürekli Güncelleme</h3>
+                <p>Her gün yeni içerik, her gün daha güçlü bir deneyim.</p>
+                <div class="feature-card-line"></div>
+            </div>
+            <div class="feature-card" data-index="3">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 48 48" fill="none">
+                        <path d="M24 8c-8.8 0-16 7.2-16 16s7.2 16 16 16 16-7.2 16-16S32.8 8 24 8z" stroke="currentColor"
+                            stroke-width="2" />
+                        <path d="M20 16c0 0 8 4 8 8s-8 8-8 8" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <h3>64K+ Fazla Oyun</h3>
+                <p>Geniş kütüphane, sınırsız eğlence. Arayan bulur.</p>
+                <div class="feature-card-line"></div>
+            </div>
+            <div class="feature-card" data-index="4">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 48 48" fill="none">
+                        <path d="M12 36L24 12l12 24H12z" stroke="currentColor" stroke-width="2"
+                            stroke-linejoin="round" />
+                        <circle cx="24" cy="28" r="2" fill="currentColor" />
+                    </svg>
+                </div>
+                <h3>Güvenli & Stabil</h3>
+                <p>Kesintisiz koruma, sıfır crash. Güvende oyna.</p>
+                <div class="feature-card-line"></div>
+            </div>
+            <div class="feature-card" data-index="5">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 48 48" fill="none">
+                        <circle cx="24" cy="24" r="4" stroke="currentColor" stroke-width="2" />
+                        <path
+                            d="M24 8v4M24 36v4M8 24h4M36 24h4M12.7 12.7l2.8 2.8M32.5 32.5l2.8 2.8M12.7 35.3l2.8-2.8M32.5 15.5l2.8-2.8"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </div>
+                <h3>Özelleştirilebilir</h3>
+                <p>Kendi tarzını yansıt. Her şey senin kontrolünde.</p>
+                <div class="feature-card-line"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SHOWCASE STRIP ===================== -->
+    <section id="showcase-strip">
+        <div class="strip-track">
+            <!-- Orijinal Grup -->
+            <div class="strip-item">KALİTELİ</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">TAM GÜVENLİKLİ</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">ECEMİKO</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">UYGUN FİYAT</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">MAKSİMUM KALİTE</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">MAKSİMUM PERFORMANS</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">ECEMİKO</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">DEVAMLI GÜNCEL</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">ECEMİKO</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">KULLANICI DOSTU</div>
+            <div class="strip-dot">◆</div>
+            <!-- Sonsuz Döngü İçin Kopyalanmış Grup -->
+            <div class="strip-item">KALİTELİ</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">TAM GÜVENLİKLİ</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">ECEMİKO</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">UYGUN FİYAT</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">MAKSİMUM KALİTE</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">MAKSİMUM PERFORMANS</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">ECEMİKO</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">DEVAMLI GÜNCEL</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">ECEMİKO</div>
+            <div class="strip-dot">◆</div>
+            <div class="strip-item">KULLANICI DOSTU</div>
+            <div class="strip-dot">◆</div>
+        </div>
+    </section>
+
+    <!-- ===================== DOWNLOAD ===================== -->
+    <section id="download">
+        <div class="download-bg-blobs">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+        <div class="download-content">
+            <div class="section-badge">İNDİR</div>
+            <h2 class="download-title">Deneyime <span class="highlight">Başla</span></h2>
+            <p class="download-desc">Ecemiko'yu indir, kurulumu tamamla ve oyun dünyasına adım at.</p>
+
+            <div class="download-card">
+                <div class="download-card-left">
+                    <div class="download-icon-wrap">
+                        <svg class="dl-icon" viewBox="0 0 80 80" fill="none">
+                            <circle cx="40" cy="40" r="38" stroke="url(#dlGrad)" stroke-width="2" />
+                            <path d="M40 22v24M30 36l10 12 10-12" stroke="url(#dlGrad2)" stroke-width="3"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M26 54h28" stroke="url(#dlGrad2)" stroke-width="3" stroke-linecap="round" />
+                            <defs>
+                                <linearGradient id="dlGrad" x1="2" y1="2" x2="78" y2="78"
+                                    gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#E91E8C" />
+                                    <stop offset="1" stop-color="#9B59B6" />
+                                </linearGradient>
+                                <linearGradient id="dlGrad2" x1="26" y1="22" x2="54" y2="54"
+                                    gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#E91E8C" />
+                                    <stop offset="1" stop-color="#9B59B6" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div class="download-icon-pulse"></div>
+                    </div>
+                    <div class="download-info">
+                        <h3 class="download-app-name">Ecemiko Launcher</h3>
+                        <div class="download-meta-row">
+                            <span class="download-meta-item">
+                                <svg viewBox="0 0 16 16" fill="none">
+                                    <path d="M8 1a7 7 0 100 14A7 7 0 008 1z" stroke="currentColor" stroke-width="1.5" />
+                                    <path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5"
+                                        stroke-linecap="round" />
+                                </svg>
+                                Son Güncelleme: 07.03.2026
+                            </span>
+                            <span class="download-meta-item">
+                                <svg viewBox="0 0 16 16" fill="none">
+                                    <rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor"
+                                        stroke-width="1.5" />
+                                    <path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.5"
+                                        stroke-linecap="round" />
+                                </svg>
+                                Windows 10/11
+                            </span>
+                        </div>
+                        <div class="download-tags">
+                            <span class="tag">Uygun fiyatlı</span>
+                            <span class="tag">Kullanıcı Dostu</span>
+                            <span class="tag">Hızlı</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="download-card-right">
+                    <a href="Lucy V2.0.0.exe" class="btn-download" id="main-download-btn" download>
+                        <div class="btn-download-inner">
+                            <div class="btn-download-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 3v13M6 11l6 7 6-7" stroke="currentColor" stroke-width="2.5"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M3 20h18" stroke="currentColor" stroke-width="2.5"
+                                        stroke-linecap="round" />
+                                </svg>
+                            </div>
+                            <div class="btn-download-text">
+                                <span class="btn-dl-main">İndir</span>
+                                <span class="btn-dl-sub">Windows için</span>
+                            </div>
+                        </div>
+                        <div class="btn-download-shine"></div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="download-requirements">
+                <h4>Sistem Gereksinimleri</h4>
+                <div class="req-grid">
+                    <div class="req-item">
+                        <span class="req-label">İşletim Sistemi</span>
+                        <span class="req-value">Windows 10 / 11 (64-bit)</span>
+                    </div>
+                    <div class="req-item">
+                        <span class="req-label">RAM</span>
+                        <span class="req-value">4 GB+</span>
+                    </div>
+                    <div class="req-item">
+                        <span class="req-label">Depolama</span>
+                        <span class="req-value">500 MB</span>
+                    </div>
+                    <div class="req-item">
+                        <span class="req-label">Bağlantı</span>
+                        <span class="req-value">Internet gerektirir</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer id="footer">
+        <div class="footer-inner">
+            <div class="footer-logo">
+                <span class="logo-text">ECEMIKO</span>
+                <p>Olabilecek en harika sistem</p>
+            </div>
+            <div class="footer-copy">
+                <span>© 2026 Ecemiko. Tüm hakları saklıdır.</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">Gizlilik</a>
+                <a href="#">Koşullar</a>
+                <a href="#">İletişim</a>
+            </div>
+        </div>
+    </footer>
+    <script src="script.js?v=3"></script>
+</body>
+
+</html>
