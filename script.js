@@ -44,17 +44,17 @@ window.addEventListener('scroll', () => {
 
 
 /* ───────────────────────────────────────────────────────────
-   3. SCROLL-DRIVEN FRAME ANIMATION
+   3. SCROLL-DRIVEN FRAME ANIMATION (GSAP + CANVAS)
    ─────────────────────────────────────────────────────────── */
 const canvas = document.getElementById('scroll-canvas');
 const ctx = canvas.getContext('2d');
 const section = document.getElementById('scroll-animation-section');
 
+// Using the correct existing JPG sequence from the original codebase
 const TOTAL = 93;
 const frameSrc = n => `ezgif-821fab6a50df84fa-jpg/ezgif-frame-${String(n).padStart(3, '0')}.jpg`;
 
 const imgs = new Array(TOTAL);
-let loaded = 0;
 let curIdx = 0;
 
 /* Resize canvas to match viewport */
@@ -85,77 +85,86 @@ function renderFrame(idx) {
     ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
 }
 
-/* Load all frames; draw first one as soon as it's ready */
-for (let i = 0; i < TOTAL; i++) {
-    const img = new Image();
-    img.onload = () => {
-        loaded++;
-        if (i === 0) renderFrame(0);    // show first frame immediately
-    };
-    img.src = frameSrc(i + 1);
-    imgs[i] = img;
-}
-
-
 /* ── UI refs ── */
 const progressLine = document.getElementById('scroll-progress-line');
 const progressDot = document.getElementById('scroll-progress-dot');
 const counterNum = document.getElementById('frame-counter-num');
 const storyPanels = document.querySelectorAll('.story-panel');
 
+/* ── Asset Preloading Logic ── */
+// Fetch and cache all frames before building the animation
+const loadPromises = [];
 
-/* ── easeInOutCubic for smoother frame interpolation ── */
-function easeInOut(t) {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+for (let i = 0; i < TOTAL; i++) {
+    const p = new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            if (i === 0) renderFrame(0); // show first frame immediately
+            resolve(img);
+        };
+        img.onerror = () => resolve(img); // resolve anyway so we don't break the chain if one fails
+        img.src = frameSrc(i + 1);
+        imgs[i] = img;
+    });
+    loadPromises.push(p);
 }
 
-/* ── Main scroll handler ── */
+/* ── Initialize GSAP ScrollTrigger once all frames are ready ── */
+Promise.all(loadPromises).then(() => {
+    // Only register ScrollTrigger after preloading ensures accurate dimensions calculation
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Context object to hold the current frame for GSAP to tween smoothly
+    const sequenceObj = { frame: 0 };
+
+    gsap.to(sequenceObj, {
+        frame: TOTAL - 1,
+        snap: "frame", // Snap to whole integers
+        ease: "none",
+        scrollTrigger: {
+            trigger: "#scroll-animation-section",
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 0.5, // 0.5s smoothing effect (butter-smooth interpolation)
+            onUpdate: (self) => {
+                const idx = Math.round(sequenceObj.frame);
+
+                // Redraw canvas if frame changed
+                if (idx !== curIdx) {
+                    curIdx = idx;
+                    renderFrame(idx);
+                }
+
+                // UI Updates: Progress rail
+                const pct = self.progress;
+                const railPct = pct * 100;
+                progressLine.style.height = railPct + '%';
+                progressDot.style.top = railPct + '%';
+
+                // UI Updates: Frame counter
+                counterNum.textContent = String(idx + 1).padStart(3, '0');
+
+                // UI Updates: Chapter panels visibility (overlapping ranges)
+                storyPanels.forEach(panel => {
+                    const from = parseFloat(panel.dataset.from);
+                    const to = parseFloat(panel.dataset.to);
+                    // generous hysteresis on exit
+                    const active = pct >= from && pct <= to + 0.06;
+                    panel.classList.toggle('visible', active);
+                });
+            }
+        }
+    });
+
+    // Refresh ScrollTrigger to recalculate layout
+    ScrollTrigger.refresh();
+});
+
+/* ── Main scroll handler (ONLY for generic section reveals now, canvas is handled by GSAP) ── */
 function onScroll() {
-    handleCanvas();
     handleScrollReveal();
 }
 window.addEventListener('scroll', onScroll, { passive: true });
-
-function handleCanvas() {
-    const top = section.offsetTop;
-    const height = section.offsetHeight;
-    const scroll = window.scrollY;
-    const vh = window.innerHeight;
-
-    /* raw 0→1 progress */
-    const raw = (scroll - top) / (height - vh);
-    const pct = Math.min(1, Math.max(0, raw));
-
-    /* eased progress → frame index */
-    const eased = easeInOut(pct);
-    const idx = Math.min(TOTAL - 1, Math.round(eased * (TOTAL - 1)));
-
-    /* render only when index changes & image is ready */
-    if (idx !== curIdx && imgs[idx]?.complete) {
-        curIdx = idx;
-        renderFrame(idx);
-    }
-
-    /* progress rail */
-    const railPct = pct * 100;
-    progressLine.style.height = railPct + '%';
-    progressDot.style.top = railPct + '%';
-
-    /* frame counter */
-    counterNum.textContent = String(idx + 1).padStart(3, '0');
-
-    /* ── Chapter panels —
-       Wide overlapping ranges so a panel is ALWAYS visible when
-       the user is inside the scroll section. Panels fade out only
-       when the next one overlaps. ── */
-    storyPanels.forEach(panel => {
-        const from = parseFloat(panel.dataset.from);
-        const to = parseFloat(panel.dataset.to);
-        /* generous hysteresis on exit so panels don't vanish too soon */
-        const active = pct >= from && pct <= to + 0.06;
-        panel.classList.toggle('visible', active);
-    });
-}
 
 
 /* ───────────────────────────────────────────────────────────
@@ -312,4 +321,3 @@ document.querySelectorAll('.faq-question').forEach(button => {
    Init
    ─────────────────────────────────────────────────────────── */
 handleScrollReveal();
-handleCanvas();
