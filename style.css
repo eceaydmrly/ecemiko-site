@@ -1686,7 +1686,7 @@ section {
     }
 
     .frame-counter {
-        position: fixed !important;
+        position: absolute !important;
         top: 100px !important;
         right: 15px !important;
         bottom: auto !important;
