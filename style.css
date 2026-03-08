@@ -540,7 +540,7 @@ body.cursor-hover #cursor-dot {
    ================================================================ */
 #scroll-animation-section {
     /* much longer scroll area to keep the sticky canvas pinned while scrolling */
-    height: 400vh;
+    height: 250vh;
     position: relative;
     margin-top: -1px;
 }
@@ -690,7 +690,8 @@ body.cursor-hover #cursor-dot {
     transform: translateX(-50%) translateY(30px);
     text-align: center;
     width: 100%;
-    max-width: 520px;
+    max-width: 440px;
+    /* Reduced from 520px */
 }
 
 /* visible states */
@@ -726,6 +727,8 @@ body.cursor-hover #cursor-dot {
 
 .story-panel--center .story-panel-inner {
     max-width: 100%;
+    padding: 1.8rem 2.2rem;
+    /* Tighter padding for center panel */
 }
 
 /* top accent */
@@ -761,6 +764,11 @@ body.cursor-hover #cursor-dot {
     color: var(--white);
     margin-bottom: 1rem;
     text-shadow: 0 2px 40px rgba(0, 0, 0, 0.7);
+}
+
+.story-panel--center .story-heading {
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    /* Smaller header specifically for center panel */
 }
 
 .story-heading em {

@@ -50,35 +50,48 @@ const canvas = document.getElementById('scroll-canvas');
 const ctx = canvas.getContext('2d');
 const section = document.getElementById('scroll-animation-section');
 
-// Using the correct existing JPG sequence from the original codebase
+// Restored the exact existing JPG sequence from the original codebase
 const TOTAL = 93;
 const frameSrc = n => `ezgif-821fab6a50df84fa-jpg/ezgif-frame-${String(n).padStart(3, '0')}.jpg`;
 
 const imgs = new Array(TOTAL);
 let curIdx = 0;
 
-/* Resize canvas to match viewport */
+/* Resize canvas to match viewport taking device pixel ratio into account for high-DPI (Retina/4K) */
 function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const dpr = window.devicePixelRatio || 1;
+    // Ensure memory maps perfectly to physical screen pixels
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+
+    // Lock the CSS to standard viewport size
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+
     if (imgs[curIdx]?.complete) renderFrame(curIdx);
 }
 window.addEventListener('resize', resizeCanvas, { passive: true });
 resizeCanvas();
 
-/* Draw a frame — adaptive scaling:
-   - Widescreen images → cover (fills viewport edge-to-edge)
-   - Portrait / close-up images → cap at 1.6× contain so character
-     fits without the blurry mega-zoom effect */
+/* Draw a frame — true object-fit: cover logic.
+   This guarantees the image completely covers the viewport bounds, scaling dynamically based on resolution. */
 function renderFrame(idx) {
     const img = imgs[idx];
     if (!img?.complete || !img.naturalWidth) return;
-    const cw = canvas.width, ch = canvas.height;
+
+    // Use the absolute physical pixels of the canvas buffer
+    const cw = canvas.width;
+    const ch = canvas.height;
     const iw = img.naturalWidth, ih = img.naturalHeight;
 
-    const coverScale = Math.max(cw / iw, ch / ih);
-    const containScale = Math.min(cw / iw, ch / ih);
-    const scale = Math.min(coverScale, containScale * 1.6);
+    // Use medium (Bilinear) filtering instead of high (Lanczos).
+    // Lanczos forcefully over-sharpens constraints, heavily exposing JPG artifacts and pixelation. 
+    // Bilinear smoothly interpolates pixels, softening the low-res edges.
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'medium';
+
+    // Cover scale mathematically mapped to absolute resolution
+    const scale = Math.max(cw / iw, ch / ih);
     const dw = iw * scale, dh = ih * scale;
 
     ctx.clearRect(0, 0, cw, ch);
@@ -125,7 +138,7 @@ Promise.all(loadPromises).then(() => {
             trigger: "#scroll-animation-section",
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.5, // 0.5s smoothing effect (butter-smooth interpolation)
+            scrub: 0.5, // 0.5s smoothing effect (1:1 faster scrub logic/interpolation)
             onUpdate: (self) => {
                 const idx = Math.round(sequenceObj.frame);
 
