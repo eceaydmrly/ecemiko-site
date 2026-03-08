@@ -227,15 +227,28 @@ const countObs = new IntersectionObserver(entries => {
     entries.forEach(e => {
         if (!e.isIntersecting) return;
         const el = e.target;
-        const target = parseInt(el.dataset.count);
-        if (isNaN(target)) return;
+        const rawTarget = el.dataset.count;
+
+        // Eğer hedef rakam değilse (örn: "64 Bin") veya 1 gibi çok küçükse animasyona sokma
+        if (isNaN(rawTarget) || parseInt(rawTarget) <= 1) {
+            el.textContent = rawTarget;
+            countObs.unobserve(el);
+            return;
+        }
+
+        const target = parseInt(rawTarget);
         const dur = 1800;
         const start = performance.now();
 
         (function tick(now) {
             const p = Math.min((now - start) / dur, 1);
             const eased = 1 - Math.pow(2, -10 * p);         // easeOutExpo
-            el.textContent = Math.floor(eased * target).toLocaleString('tr-TR');
+
+            // Eğer hedef sayı çok küçükse (1 gibi) Math.floor 0'da bırakabiliyor.
+            // Küçük sayılarda Math.ceil kullanarak direkt rakama ulaşmasını sağlıyoruz.
+            const current = target < 10 ? Math.ceil(eased * target) : Math.floor(eased * target);
+            el.textContent = current.toLocaleString('tr-TR');
+
             if (p < 1) requestAnimationFrame(tick);
         })(start);
 
@@ -409,7 +422,7 @@ function initLightbox() {
 
     let currentIndex = 1;
     const totalImages = 8;
-    const baseDir = 'Görseller/';
+    const baseDir = 'showimgs/';
 
     // Generate thumbnails
     thumbsContainer.innerHTML = '';
