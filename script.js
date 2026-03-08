@@ -621,8 +621,232 @@ if (typeof firebase !== 'undefined') {
 }
 const auth = typeof firebase !== 'undefined' ? firebase.auth() : null;
 const db = typeof firebase !== 'undefined' ? firebase.database() : null;
+const IMGBB_API_KEY = "c18bc77ca0f6844dc5d500012ad7ea3e"; // User's private API key
 
 function initAuthLogic() {
+    // --- PROFILE DROPDOWN & SETTINGS LOGIC ---
+    const userProfile = document.getElementById('user-profile');
+    const userDropdown = document.getElementById('user-dropdown');
+    const settingsModal = document.getElementById('settings-modal');
+    const dropdownEmail = document.getElementById('dropdown-user-email');
+
+    // Toggle Dropdown
+    userProfile.onclick = (e) => {
+        e.stopPropagation();
+        userProfile.classList.toggle('dropdown-active');
+    };
+
+    // Close on click outside
+    document.addEventListener('click', () => {
+        userProfile.classList.remove('dropdown-active');
+    });
+
+    // Settings Modal Open Views
+    const openView = (viewId, title) => {
+        document.querySelectorAll('.settings-view').forEach(v => v.style.display = 'none');
+        document.getElementById(viewId).style.display = 'flex';
+        document.getElementById('settings-title').textContent = title;
+
+        const subtitle = document.getElementById('settings-subtitle');
+        subtitle.textContent = "Bilgilerini buradan güncelleyebilirsin.";
+        subtitle.style.color = "var(--text-muted)";
+
+        document.getElementById('settings-error').textContent = '';
+        settingsModal.classList.add('active');
+    };
+
+    // Close Settings Modal Logic
+    const closeSettings = () => {
+        settingsModal.classList.remove('active');
+    };
+
+    settingsModal.querySelector('.modal-close').onclick = closeSettings;
+    settingsModal.querySelector('.modal-overlay').onclick = closeSettings;
+
+    document.getElementById('open-settings-name').onclick = () => openView('view-change-name', 'Adı Değiştir');
+    document.getElementById('open-settings-photo').onclick = () => openView('view-change-photo', 'Fotoğrafı Değiştir');
+    document.getElementById('open-settings-password').onclick = () => openView('view-change-password', 'Şifreyi Değiştir');
+
+    // Save Name
+    document.getElementById('save-name-btn').onclick = async () => {
+        const newName = document.getElementById('new-display-name').value.trim();
+        if (!newName) return;
+        try {
+            await auth.currentUser.updateProfile({ displayName: newName });
+            document.getElementById('user-name').textContent = newName;
+            showSuccess();
+        } catch (e) { showError(e.message); }
+    };
+
+    // --- PHOTO UPLOAD & CROP LOGIC ---
+    let profileCropper = null;
+
+    const photoUploadStep = document.getElementById('photo-upload-step');
+    const photoCropStep = document.getElementById('photo-crop-step');
+    const cropperImage = document.getElementById('cropper-image');
+    const fileLabelText = document.getElementById('file-label-text');
+
+    // File selected handler
+    document.getElementById('new-photo-file').onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Change UI to reflect selection
+        fileLabelText.textContent = "Fotoğraf Seçildi: " + file.name;
+
+        // Load image into cropper
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            cropperImage.src = event.target.result;
+
+            // Switch steps
+            photoUploadStep.style.display = 'none';
+            photoCropStep.style.display = 'block';
+
+            // Init Cropper
+            if (profileCropper) profileCropper.destroy();
+            profileCropper = new Cropper(cropperImage, {
+                aspectRatio: 1,
+                viewMode: 2,
+                dragMode: 'move',
+                background: false,
+                autoCropArea: 1,
+                responsive: true
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+
+    // Confirm Crop and Upload
+    document.getElementById('confirm-crop-btn').onclick = () => {
+        if (!profileCropper) return;
+
+        const canvas = profileCropper.getCroppedCanvas({
+            width: 512,
+            height: 512
+        });
+
+        canvas.toBlob(async (blob) => {
+            const formData = new FormData();
+            formData.append('image', blob);
+
+            const progressBar = document.getElementById('upload-progress');
+            const progressFill = progressBar.querySelector('.progress-fill');
+            const user = auth.currentUser;
+
+            progressBar.style.display = 'block';
+            progressFill.style.width = '30%';
+
+            // Start Loading State for Subtitle
+            const subtitle = document.getElementById('settings-subtitle');
+            subtitle.textContent = "Fotoğraf Olarak İşleniyor ve Yükleniyor... Lütfen Bekleyin.";
+            subtitle.style.color = "var(--pink)";
+
+            // Hide crop step, show upload progress
+            photoCropStep.style.display = 'none';
+
+            try {
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    progressFill.style.width = '100%';
+                    const downloadURL = data.data.url;
+                    await user.updateProfile({ photoURL: downloadURL });
+                    document.getElementById('user-photo').src = downloadURL;
+                    setTimeout(() => {
+                        progressBar.style.display = 'none';
+                        photoUploadStep.style.display = 'flex'; // Reset for next time
+                        fileLabelText.textContent = "Bilgisayardan Fotoğraf Seç";
+                        showSuccess();
+                    }, 500);
+                } else {
+                    throw new Error(data.error.message);
+                }
+            } catch (error) {
+                showError("Yükleme Hatası: " + error.message);
+                progressBar.style.display = 'none';
+                photoUploadStep.style.display = 'flex';
+                const subtitle = document.getElementById('settings-subtitle');
+                subtitle.textContent = "Bilgilerini buradan güncelleyebilirsin.";
+                subtitle.style.color = "var(--text-muted)";
+            }
+        }, 'image/jpeg');
+    };
+
+    // Cancel Crop
+    document.getElementById('cancel-crop-btn').onclick = () => {
+        photoCropStep.style.display = 'none';
+        photoUploadStep.style.display = 'flex';
+        document.getElementById('new-photo-file').value = "";
+        fileLabelText.textContent = "Bilgisayardan Fotoğraf Seç";
+        if (profileCropper) profileCropper.destroy();
+    };
+
+    // Save Photo via URL
+    document.getElementById('save-photo-btn').onclick = async () => {
+        const urlInput = document.getElementById('new-photo-url');
+        const user = auth.currentUser;
+        const newPhotoURL = urlInput.value.trim();
+
+        if (newPhotoURL) {
+            try {
+                const subtitle = document.getElementById('settings-subtitle');
+                subtitle.textContent = "Bağlantı Kontrol Ediliyor...";
+                subtitle.style.color = "var(--pink)";
+
+                await user.updateProfile({ photoURL: newPhotoURL });
+                document.getElementById('user-photo').src = newPhotoURL;
+                showSuccess();
+            } catch (e) {
+                showError(e.message);
+                const subtitle = document.getElementById('settings-subtitle');
+                subtitle.textContent = "Bilgilerini buradan güncelleyebilirsin.";
+                subtitle.style.color = "var(--text-muted)";
+            }
+        }
+    };
+
+    // Save Password
+    document.getElementById('save-password-btn').onclick = async () => {
+        const newPass = document.getElementById('new-password').value;
+        if (newPass.length < 6) return showError("Şifre en az 6 karakter olmalı!");
+        try {
+            await auth.currentUser.updatePassword(newPass);
+            showSuccess();
+        } catch (e) {
+            if (e.code === 'auth/requires-recent-login') {
+                showError("Güvenlik nedeniyle oturum süresi dolmuş. Lütfen hesaptan çıkış yapıp tekrar girdikten sonra şifrenizi güncelleyin.");
+            } else {
+                showError(e.message);
+            }
+        }
+    };
+
+    const showError = (msg) => {
+        document.getElementById('settings-error').textContent = msg;
+    };
+
+    const showSuccess = () => {
+        const subtitle = document.getElementById('settings-subtitle');
+        subtitle.textContent = "Değişiklikler başarıyla kaydedildi!";
+        subtitle.style.color = "#4CAF50";
+        document.getElementById('settings-form').style.display = 'none';
+
+        setTimeout(() => {
+            settingsModal.classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('settings-form').style.display = 'flex';
+                subtitle.textContent = "Bilgilerini buradan güncelleyebilirsin.";
+                subtitle.style.color = "var(--text-muted)";
+            }, 300); // Wait for modal slide-up animation to finish
+        }, 1000);
+    };
+
+
     const validCodes = [
         "ECW-A3X7", "ECW-M9R2", "ECW-K4F8", "ECW-P7Y3", "ECW-T2W5",
         "ECW-H8N4", "ECW-B5J9", "ECW-C6V2", "ECW-D3M7", "ECW-E9K4",
@@ -654,12 +878,17 @@ function initAuthLogic() {
     const userProfileEl = document.getElementById('user-profile');
     const userNameEl = document.getElementById('user-name');
     const userPhotoEl = document.getElementById('user-photo');
-    const logoutBtn = document.getElementById('logout-btn');
+    const logoutBtn = document.getElementById('nav-logout-btn');
+    const navEnterCode = document.getElementById('nav-enter-code');
 
     const googleBtn = document.getElementById('google-login-btn');
     const emailLoginBtn = document.getElementById('email-login-btn');
+    const emailRegisterBtn = document.getElementById('email-register-btn');
     const loginEmailInput = document.getElementById('login-email');
     const loginPassInput = document.getElementById('login-password');
+    const registerUserBox = document.getElementById('register-username');
+    const registerEmailInput = document.getElementById('register-email');
+    const registerPassInput = document.getElementById('register-password');
     const loginError = document.getElementById('login-error');
 
     const codeInput = document.getElementById('auth-code-input');
@@ -668,27 +897,36 @@ function initAuthLogic() {
 
     function updateNavUI(user) {
         if (user) {
-            navAuthTrigger.style.display = 'none';
-            userProfileEl.style.display = 'flex';
+            // Logged In: Show Profile, Hide Login Trigger
+            navAuthTrigger.classList.add('hidden-auth');
+            userProfileEl.classList.remove('hidden-auth');
+
             userNameEl.textContent = user.displayName || user.email.split('@')[0];
             userPhotoEl.src = user.photoURL || 'https://www.gravatar.com/avatar/0000?d=mp';
 
-            // Kullanıcı girmiş ama kod girmemiş mi?
+            // Check for code
             const savedCode = localStorage.getItem('ecemiko_auth_code_' + user.uid);
             if (savedCode) {
                 document.body.classList.add('authenticated');
-                navDownloadBtn.style.display = 'inline-flex';
+                navDownloadBtn.classList.remove('hidden-auth');
                 navDownloadBtn.textContent = 'İndir';
+                navEnterCode.classList.add('hidden-auth');
             } else {
                 document.body.classList.remove('authenticated');
-                navDownloadBtn.style.display = 'inline-flex';
+                navDownloadBtn.classList.remove('hidden-auth');
                 navDownloadBtn.textContent = 'Kodu Gir';
+                navEnterCode.classList.remove('hidden-auth');
             }
         } else {
-            navAuthTrigger.style.display = 'inline-flex';
-            userProfileEl.style.display = 'none';
-            navDownloadBtn.style.display = 'none';
+            // Logged Out: Show Login Trigger, Hide Profile
+            navAuthTrigger.classList.remove('hidden-auth');
+            userProfileEl.classList.add('hidden-auth');
+            navDownloadBtn.classList.add('hidden-auth');
+            navEnterCode.classList.add('hidden-auth');
             document.body.classList.remove('authenticated');
+            // Reset placeholders
+            userNameEl.textContent = 'Kullanıcı';
+            userPhotoEl.src = '';
         }
     }
 
@@ -723,16 +961,98 @@ function initAuthLogic() {
         }
     };
 
-    // E-posta ile Giriş/Kayıt
-    emailLoginBtn.onclick = () => {
+    // E-posta ile Giriş
+    emailLoginBtn.onclick = async () => {
         const email = loginEmailInput.value.trim();
         const pass = loginPassInput.value.trim();
-        if (!email || !pass) return;
+        if (!email || !pass) {
+            loginError.textContent = "Lütfen tüm alanları doldurun.";
+            loginError.classList.add('visible');
+            return;
+        }
 
-        auth.signInWithEmailAndPassword(email, pass).catch(() => {
-            return auth.createUserWithEmailAndPassword(email, pass);
-        }).catch(e => loginError.textContent = e.message);
+        try {
+            await auth.signInWithEmailAndPassword(email, pass);
+        } catch (e) {
+            loginError.textContent = "Giriş Hatası: " + e.message;
+            loginError.classList.add('visible');
+        }
     };
+
+    // E-posta ile Kayıt
+    emailRegisterBtn.onclick = async () => {
+        const username = registerUserBox.value.trim();
+        const email = registerEmailInput.value.trim();
+        const pass = registerPassInput.value.trim();
+
+        if (!username || !email || !pass) {
+            loginError.textContent = "Lütfen tüm alanları doldurun.";
+            loginError.classList.add('visible');
+            return;
+        }
+
+        try {
+            const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
+            // Güncelleme işlemi Firebase'e yapılır
+            await userCredential.user.updateProfile({
+                displayName: username
+            });
+            // Manuel güncelleme
+            userNameEl.textContent = username;
+        } catch (e) {
+            loginError.textContent = "Kayıt Hatası: " + e.message;
+            loginError.classList.add('visible');
+        }
+    };
+
+    // Tab Geçişleri
+    const tabLogin = document.getElementById('tab-login');
+    const tabRegister = document.getElementById('tab-register');
+    const loginFormGroup = document.getElementById('login-form-group');
+    const registerFormGroup = document.getElementById('register-form-group');
+
+    if (tabLogin && tabRegister) {
+        tabLogin.onclick = () => {
+            tabLogin.classList.add('active');
+            tabRegister.classList.remove('active');
+            loginFormGroup.style.display = 'flex';
+            registerFormGroup.style.display = 'none';
+            loginError.classList.remove('visible');
+        };
+        tabRegister.onclick = () => {
+            tabRegister.classList.add('active');
+            tabLogin.classList.remove('active');
+            registerFormGroup.style.display = 'flex';
+            loginFormGroup.style.display = 'none';
+            loginError.classList.remove('visible');
+        };
+    }
+
+    // ENTER Tık Tetikleme (Keyboard Accessibility)
+    const triggerClickOnEnter = (inputEl, btnEl) => {
+        if (inputEl) {
+            inputEl.addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    btnEl.click();
+                }
+            });
+        }
+    };
+
+    triggerClickOnEnter(loginEmailInput, emailLoginBtn);
+    triggerClickOnEnter(loginPassInput, emailLoginBtn);
+
+    triggerClickOnEnter(registerUserBox, emailRegisterBtn);
+    triggerClickOnEnter(registerEmailInput, emailRegisterBtn);
+    triggerClickOnEnter(registerPassInput, emailRegisterBtn);
+
+    triggerClickOnEnter(codeInput, codeSubmitBtn);
+
+    triggerClickOnEnter(document.getElementById('new-display-name'), document.getElementById('save-name-btn'));
+    triggerClickOnEnter(document.getElementById('new-password'), document.getElementById('save-password-btn'));
+    triggerClickOnEnter(document.getElementById('new-photo-url'), document.getElementById('save-photo-btn'));
+
 
     // Kod Doğrulama
     codeSubmitBtn.onclick = async () => {
@@ -770,15 +1090,26 @@ function initAuthLogic() {
         }
     };
 
-    // Auth State Observer
+    // Auth State Observer (Consolidated & Bulletproof)
     auth.onAuthStateChanged(user => {
         updateNavUI(user);
+
         if (user) {
+            // User is logged in
             loginModal.classList.remove('active');
+            dropdownEmail.textContent = user.email;
+
+            // Check for code
             const savedCode = localStorage.getItem('ecemiko_auth_code_' + user.uid);
             if (!savedCode) {
                 setTimeout(() => authModal.classList.add('active'), 800);
             }
+        } else {
+            // User is logged out
+            document.body.classList.remove('authenticated');
+            // Ensure any modals that depend on auth are closed
+            settingsModal.classList.remove('active');
+            authModal.classList.remove('active');
         }
     });
 
@@ -791,6 +1122,7 @@ function initAuthLogic() {
     };
 
     logoutBtn.onclick = () => auth.signOut();
+    navEnterCode.onclick = () => authModal.classList.add('active');
     document.getElementById('login-skip-btn').onclick = () => loginModal.classList.remove('active');
 
     // Tıklandığında overlay kapatma

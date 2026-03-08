@@ -13,6 +13,7 @@
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="style.css?v=3" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
 </head>
 
 <body>
@@ -37,10 +38,37 @@
                 <li><a href="#download" class="nav-link auth-dynamic-btn">İndir</a></li>
             </ul>
             <div class="nav-cta">
-                <div id="user-profile" class="user-profile-nav" style="display: none;">
-                    <img id="user-photo" src="" alt="User">
-                    <span id="user-name"></span>
-                    <button id="logout-btn" class="logout-minimal">Çıkış</button>
+                <div id="user-profile" class="account-premium-pill auth-required"
+                    style="display: none; cursor: pointer; position: relative;">
+                    <div class="pill-avatar">
+                        <img id="user-photo" src="" alt="Profil">
+                    </div>
+                    <span id="user-name">Kullanıcı</span>
+                    <i class="fas fa-chevron-down pill-chevron"></i>
+
+                    <!-- Premium Dropdown Menu -->
+                    <div id="user-dropdown" class="profile-dropdown">
+                        <div class="dropdown-header">
+                            <span id="dropdown-user-email">email@example.com</span>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item" id="open-settings-name">
+                            <i class="fas fa-user-edit"></i> Adı Değiştir
+                        </a>
+                        <a href="#" class="dropdown-item" id="open-settings-photo">
+                            <i class="fas fa-camera"></i> Fotoğrafı Değiştir
+                        </a>
+                        <a href="#" class="dropdown-item" id="open-settings-password">
+                            <i class="fas fa-key"></i> Şifreyi Değiştir
+                        </a>
+                        <a href="#" class="dropdown-item" id="nav-enter-code">
+                            <i class="fas fa-ticket-alt"></i> Kodu Gir
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item logout-item" id="nav-logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+                        </a>
+                    </div>
                 </div>
                 <button id="nav-auth-trigger" class="btn-nav">Giriş Yap</button>
                 <a href="#download" class="btn-nav auth-dynamic-btn" id="nav-download-btn"
@@ -182,8 +210,10 @@
                         <div class="faq-icon">+</div>
                     </button>
                     <div class="faq-answer">
-                        <p>Evet, olabilecek en uygun fiyatlı şekilde herkesin erişebileceği kadar uygun! Uygulamayı
-                            sitemizden indirip verilen kod ile hemen kullanmaya başlayabilirsin.</p>
+                        <p>Evet! 🌸 Olabilecek en tatlı ve uygun fiyatla, herkes rahatça ulaşsın istedik!
+                            Uygulamamızı
+                            sitemizden indirip sana verdiğimiz o minik kodla hemen sihirli dünyaya adım atabilirsin! ✨💖
+                        </p>
                     </div>
                 </div>
 
@@ -193,8 +223,10 @@
                         <div class="faq-icon">+</div>
                     </button>
                     <div class="faq-answer">
-                        <p>Windows 10 ve üzeri işletim sistemlerinde sorunsuzca çalışır. Ecemiko, cihazını yormayacak
-                            ultra hafif bir mimari ile kodlanmıştır.</p>
+                        <p>Windows 10 ve üzeri bir sistemin varsa hiç dert etme, tıkır tıkır çalışıyor! 🎀 Ecemiko,
+                            bilgisayarını asla yormayacak kadar minnoş ve hafif bir yapıyla tasarlandı. Sen sadece
+                            keyfini çıkar!
+                        </p>
                     </div>
                 </div>
 
@@ -204,8 +236,12 @@
                         <div class="faq-icon">+</div>
                     </button>
                     <div class="faq-answer">
-                        <p>Evet, kendi geliştirdiğimiz akıllı güncelleme sistemi sayesinde yeni bir sürüm
-                            yayınlandığında uygulama saniyeler içinde arka planda güncellenir.</p>
+                        <p>Kesinlikle evet! Yeni bir sürüm geldiğinde değerli vaktini çalmamak için seni sıkmıyoruz.
+                            Kendi
+                            geliştirdiğimiz
+                            akıllı sistem sayesinde gelen sihirli ''Güncellemeyi İndir'' butonu ile, arka planda
+                            saniyeler içinde kendini güncelliyor!
+                            🪄✨</p>
                     </div>
                 </div>
 
@@ -215,9 +251,11 @@
                         <div class="faq-icon">+</div>
                     </button>
                     <div class="faq-answer">
-                        <p>Tüm bağlantılarımız uçtan uca şifrelidir ve verilerin hiçbir zaman üçüncü taraflarla
-                            paylaşılmaz. Sistem bir banka güvenliği kadar yoğun güvenlik içindedir. Senin güvenliğin her
-                            şeyden önce gelir.</p>
+                        <p>Bu konuda inanılmaz titiziz! 🔐 Tüm bağlantıların sıkı sıkıya şifreleniyor ve verilerini
+                            kimseciklerle
+                            paylaşmıyoruz! Sistemi adeta bir banka kasası gibi kilit altında tutuyoruz. Çünkü senin o
+                            güzel
+                            güvenliğin her şeyden önemli!</p>
                     </div>
                 </div>
             </div>
@@ -486,6 +524,68 @@
 
     <!-- GSAP for Butter-Smooth Scroll Triggering via Canvas -->
     <!-- ===================== LOGIN/REGISTER MODAL ===================== -->
+    <!-- Profile Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content auth-content">
+            <button class="modal-close">&times;</button>
+            <div class="auth-header">
+                <h2 id="settings-title">Profili Düzenle</h2>
+                <p id="settings-subtitle">Bilgilerini buradan güncelleyebilirsin.</p>
+            </div>
+
+            <div class="auth-input-group" id="settings-form">
+                <!-- Name Change View -->
+                <div id="view-change-name" class="settings-view">
+                    <input type="text" id="new-display-name" placeholder="Yeni Kullanıcı Adı">
+                    <button id="save-name-btn" class="btn-primary">Adı Güncelle</button>
+                </div>
+
+                <!-- Photo Change View -->
+                <div id="view-change-photo" class="settings-view" style="display: none;">
+                    <div id="photo-upload-step">
+                        <div class="file-upload-wrapper">
+                            <label for="new-photo-file" class="file-upload-label" id="drop-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span id="file-label-text">Bilgisayardan Fotoğraf Seç</span>
+                            </label>
+                            <input type="file" id="new-photo-file" accept="image/*" style="display: none;">
+                        </div>
+                        <div class="auth-divider"><span>VEYA</span></div>
+                        <input type="url" id="new-photo-url" placeholder="Fotoğraf URL'si Yapıştır">
+                        <button id="save-photo-btn" class="btn-primary">Fotoğrafı Güncelle</button>
+                    </div>
+
+                    <!-- Cropping Step (Hidden Initially) -->
+                    <div id="photo-crop-step" style="display: none;">
+                        <div class="cropper-wrapper">
+                            <img id="cropper-image" src="" alt="Düzeltme Yap">
+                        </div>
+                        <div class="cropper-controls">
+                            <button id="cancel-crop-btn" class="btn-ghost">Vazgeç</button>
+                            <button id="confirm-crop-btn" class="btn-primary">Kırp ve Kaydet</button>
+                        </div>
+                    </div>
+
+                    <div id="upload-progress" class="upload-progress-bar" style="display: none;">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Password Change View -->
+                <div id="view-change-password" class="settings-view" style="display: none;">
+                    <input type="password" id="new-password" placeholder="Yeni Şifre">
+                    <button id="save-password-btn" class="btn-primary">Şifreyi Güncelle</button>
+                </div>
+            </div>
+
+            <div id="settings-error" class="auth-error-msg"></div>
+            <div id="settings-success" class="auth-success-msg"
+                style="color: #4CAF50; font-size: 0.8rem; margin-top: 10px; text-align: center; display: none;">
+                Değişiklikler kaydedildi!</div>
+        </div>
+    </div>
+
     <div id="login-modal" class="modal">
         <div class="modal-overlay"></div>
         <div class="modal-content auth-content">
@@ -516,14 +616,28 @@
 
                 <div class="auth-divider"><span>Veya</span></div>
 
-                <div class="auth-input-group">
+                <div class="auth-toggle-group">
+                    <button id="tab-login" class="auth-tab active">Giriş Yap</button>
+                    <button id="tab-register" class="auth-tab">Kayıt Ol</button>
+                </div>
+
+                <div class="auth-input-group" id="login-form-group">
                     <input type="email" id="login-email" placeholder="E-posta Adresi">
                     <input type="password" id="login-password" placeholder="Şifre">
-                    <button id="email-login-btn" class="btn-primary">Giriş Yap / Kayıt Ol</button>
+                    <button id="email-login-btn" class="btn-primary" style="justify-content: center;">Giriş Yap</button>
+                </div>
+
+                <div class="auth-input-group" id="register-form-group" style="display: none;">
+                    <input type="text" id="register-username" placeholder="Kullanıcı Adı">
+                    <input type="email" id="register-email" placeholder="E-posta Adresi">
+                    <input type="password" id="register-password" placeholder="Şifre">
+                    <button id="email-register-btn" class="btn-primary" style="justify-content: center;">Kayıt
+                        Ol</button>
                 </div>
             </div>
             <p id="login-error" class="auth-error-msg"></p>
             <button id="login-skip-btn" class="auth-skip">Sadece siteye göz at</button>
+
         </div>
     </div>
 
@@ -606,6 +720,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="script.js?v=13"></script>
 </body>
 
