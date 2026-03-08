@@ -693,9 +693,23 @@ function initAuthLogic() {
     }
 
     // Google ile Giriş
-    googleBtn.onclick = () => {
+    googleBtn.onclick = async () => {
+        loginError.textContent = "Bağlanıyor...";
         const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider).catch(e => loginError.textContent = e.message);
+        provider.setCustomParameters({ prompt: 'select_account' });
+
+        try {
+            await auth.signInWithPopup(provider);
+        } catch (e) {
+            console.error("Google Login Error:", e);
+            if (e.code === 'auth/popup-closed-by-user') {
+                loginError.textContent = "Giriş penceresi kapatıldı.";
+            } else if (e.code === 'auth/unauthorized-domain') {
+                loginError.textContent = "Bu alan adı yetkilendirilmemiş!";
+            } else {
+                loginError.textContent = "Giriş yapılamadı: " + e.message;
+            }
+        }
     };
 
     // E-posta ile Giriş/Kayıt

@@ -2113,35 +2113,50 @@ body.authenticated a.btn-primary.auth-required {
 }
 
 /* ============ COMPREHENSIVE AUTH STYLES ============ */
+.nav-cta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
 .user-profile-nav {
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    margin-right: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 #user-photo {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     border: 1px solid var(--pink);
+    object-fit: cover;
 }
 
 #user-name {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--white);
     font-family: var(--font-display);
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .logout-minimal {
-    background: none;
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: var(--text-muted);
-    font-size: 0.75rem;
-    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s;
+    font-weight: 600;
 }
 
 .logout-minimal:hover {
@@ -2153,30 +2168,35 @@ body.authenticated a.btn-primary.auth-required {
 .auth-methods {
     display: flex;
     flex-direction: column;
-    gap: 1.2rem;
+    gap: 1rem;
+    width: 100%;
 }
 
 .btn-google {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
-    background: white;
+    gap: 0.8rem;
+    background: #ffffff;
     color: #1a1a1a;
     border: none;
     border-radius: 12px;
-    padding: 0.8rem;
-    font-weight: 600;
+    padding: 1rem;
+    font-weight: 700;
+    font-size: 0.9rem;
     cursor: pointer;
-    transition: transform 0.3s;
+    transition: all 0.3s;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .btn-google:hover {
     transform: translateY(-2px);
-    background: #f1f1f1;
+    background: #f8f8f8;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
-.btn-google img {
+.btn-google svg {
     width: 20px;
     height: 20px;
 }
@@ -2186,7 +2206,8 @@ body.authenticated a.btn-primary.auth-required {
     align-items: center;
     gap: 1rem;
     color: var(--text-muted);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    margin: 0.5rem 0;
 }
 
 .auth-divider::before,
@@ -2197,9 +2218,30 @@ body.authenticated a.btn-primary.auth-required {
     background: rgba(255, 255, 255, 0.1);
 }
 
-#login-modal .auth-input-group input {
+.auth-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    width: 100%;
+}
+
+.auth-input-group input {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    color: var(--white) !important;
+    font-size: 0.9rem !important;
+    outline: none !important;
+    transition: all 0.3s !important;
     letter-spacing: normal !important;
     text-align: left !important;
+}
+
+.auth-input-group input:focus {
+    border-color: var(--pink) !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 0 0 15px rgba(233, 30, 140, 0.2) !important;
 }
 
 /* Fix for overlapping modals */
