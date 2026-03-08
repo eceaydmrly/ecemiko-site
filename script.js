@@ -695,6 +695,13 @@ function initAuthLogic() {
     // Google ile Giriş
     googleBtn.onclick = async () => {
         loginError.textContent = "Bağlanıyor...";
+        loginError.classList.add('visible');
+
+        if (!auth) {
+            loginError.textContent = "Firebase Auth yüklenemedi!";
+            return;
+        }
+
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
 
@@ -703,11 +710,13 @@ function initAuthLogic() {
         } catch (e) {
             console.error("Google Login Error:", e);
             if (e.code === 'auth/popup-closed-by-user') {
-                loginError.textContent = "Giriş penceresi kapatıldı.";
+                loginError.textContent = "Giriş penceresi kullanıcı tarafından kapatıldı.";
             } else if (e.code === 'auth/unauthorized-domain') {
-                loginError.textContent = "Bu alan adı yetkilendirilmemiş!";
+                loginError.textContent = "HATA: " + window.location.hostname + " alanı Firebase'de yetkilendirilmemiş!";
+            } else if (e.code === 'auth/operation-not-allowed') {
+                loginError.textContent = "HATA: Firebase panelinde Google Girişi aktif değil.";
             } else {
-                loginError.textContent = "Giriş yapılamadı: " + e.message;
+                loginError.textContent = "Sistem Hatası: " + e.code;
             }
         }
     };
