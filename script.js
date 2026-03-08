@@ -136,7 +136,7 @@ Promise.all(loadPromises).then(() => {
             trigger: "#scroll-animation-section",
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.5, // 0.5s smoothing effect (1:1 faster scrub logic/interpolation)
+            scrub: true, // Ties the animation exactly 1:1 to the scroll position, no lag to prevent cutoff
             onUpdate: (self) => {
                 const idx = Math.round(sequenceObj.frame);
 
@@ -329,6 +329,151 @@ document.querySelectorAll('.faq-question').forEach(button => {
 
 
 /* ───────────────────────────────────────────────────────────
+   11. GITHUB RELEASE FETCHER
+   ─────────────────────────────────────────────────────────── */
+async function fetchLatestRelease() {
+    const repo = 'sovmeyingo/Lucy-Updates';
+    const api = `https://api.github.com/repos/${repo}/releases/latest`;
+
+    try {
+        const response = await fetch(api);
+        if (!response.ok) throw new Error('Release fetch failed');
+
+        const data = await response.json();
+        const dlBtn = document.getElementById('main-download-btn');
+        const titleEl = document.getElementById('release-title');
+        const dateEl = document.getElementById('release-date');
+        const heroBtn = document.getElementById('hero-download-btn');
+
+        // Find the first .exe asset
+        const exeAsset = data.assets.find(asset => asset.name.endsWith('.exe'));
+
+        if (exeAsset && dlBtn) {
+            dlBtn.href = exeAsset.browser_download_url;
+            // Also update the hero section download button to anchor correctly
+            if (heroBtn) heroBtn.href = "#download";
+        }
+
+        if (titleEl) {
+            titleEl.textContent = `Ecemiko Launcher ${data.tag_name}`;
+        }
+
+        if (dateEl) {
+            const date = new Date(data.published_at);
+            const formatted = date.toLocaleDateString('tr-TR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            // Eğer tarih değiştiyse animasyonlu geçiş yap (Eş Zamanlı hissettirir)
+            if (dateEl.textContent !== `Son Güncelleme: ${formatted}`) {
+                dateEl.style.transition = 'opacity 0.3s';
+                dateEl.style.opacity = '0';
+                setTimeout(() => {
+                    dateEl.textContent = `Son Güncelleme: ${formatted}`;
+                    dateEl.style.opacity = '0.7';
+                }, 300);
+            }
+        }
+
+        console.log(`Latest release fetched: ${data.tag_name}`);
+    } catch (error) {
+        console.error('Error fetching latest release:', error);
+        // Hata durumunda statik ama güvenli bir metin
+        const dateEl = document.getElementById('release-date');
+        if (dateEl && dateEl.textContent.includes('Bekleniyor')) {
+            dateEl.textContent = "Güncelleme bilgisi şuan alınamıyor.";
+        }
+    }
+}
+
+// Her 10 dakikada bir otomatik kontrol et (Sayfayı yenilemeye gerek kalmadan "Eş Zamanlı" kontrol)
+setInterval(fetchLatestRelease, 10 * 60 * 1000);
+
+
+/* ───────────────────────────────────────────────────────────
+   12. LIGHTBOX SHOWCASE LOGIC
+   ─────────────────────────────────────────────────────────── */
+function initLightbox() {
+    const card = document.getElementById('premium-design-card');
+    const modal = document.getElementById('lightbox-modal');
+    const closeBtn = document.getElementById('modal-close');
+    const modalImg = document.getElementById('modal-img');
+    const nextBtn = document.getElementById('next-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const caption = document.getElementById('image-caption');
+    const thumbsContainer = document.getElementById('modal-thumbnails');
+    const overlay = document.querySelector('.modal-overlay');
+
+    if (!card || !modal) return;
+
+    let currentIndex = 1;
+    const totalImages = 8;
+    const baseDir = 'Görseller/';
+
+    // Generate thumbnails
+    thumbsContainer.innerHTML = '';
+    for (let i = 1; i <= totalImages; i++) {
+        const thumb = document.createElement('img');
+        thumb.src = `${baseDir}${i}.png`;
+        thumb.className = 'thumb-item';
+        thumb.dataset.idx = i;
+        thumb.onclick = () => updateImage(i);
+        thumbsContainer.appendChild(thumb);
+    }
+
+    function updateImage(index) {
+        currentIndex = index;
+        modalImg.src = `${baseDir}${currentIndex}.png`;
+        caption.textContent = `Görsel ${currentIndex} / ${totalImages}`;
+
+        // Update active thumb
+        document.querySelectorAll('.thumb-item').forEach(t => {
+            t.classList.toggle('active', parseInt(t.dataset.idx) === currentIndex);
+        });
+    }
+
+    card.addEventListener('click', () => {
+        modal.classList.add('active');
+        updateImage(1);
+        document.body.style.overflow = 'hidden'; // Stop page scroll
+    });
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+
+    nextBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        let next = currentIndex + 1;
+        if (next > totalImages) next = 1;
+        updateImage(next);
+    });
+
+    prevBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        let prev = currentIndex - 1;
+        if (prev < 1) prev = totalImages;
+        updateImage(prev);
+    });
+
+    // Keyboard support
+    document.addEventListener('keydown', (e) => {
+        if (!modal.classList.contains('active')) return;
+        if (e.key === 'Escape') closeModal();
+        if (e.key === 'ArrowRight') nextBtn.click();
+        if (e.key === 'ArrowLeft') prevBtn.click();
+    });
+}
+
+
+/* ───────────────────────────────────────────────────────────
    Init
    ─────────────────────────────────────────────────────────── */
 handleScrollReveal();
+fetchLatestRelease();
+initLightbox();
