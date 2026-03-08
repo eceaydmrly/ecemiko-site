@@ -42,6 +42,25 @@ window.addEventListener('scroll', () => {
     navbar.classList.toggle('scrolled', window.scrollY > 20);
 }, { passive: true });
 
+// Smooth scroll for navbar links with height offset
+document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        const targetEl = document.querySelector(targetId);
+        if (!targetEl) return;
+
+        const navHeight = navbar.offsetHeight || 80;
+        const targetPos = targetEl.getBoundingClientRect().top + window.pageYOffset - navHeight;
+
+        window.scrollTo({
+            top: targetPos,
+            behavior: 'smooth'
+        });
+    });
+});
+
+
 
 /* ───────────────────────────────────────────────────────────
    3. SCROLL-DRIVEN FRAME ANIMATION (GSAP + CANVAS)
@@ -159,8 +178,12 @@ Promise.all(loadPromises).then(() => {
                 storyPanels.forEach(panel => {
                     const from = parseFloat(panel.dataset.from);
                     const to = parseFloat(panel.dataset.to);
-                    // generous hysteresis on exit
-                    const active = pct >= from && pct <= to + 0.06;
+
+                    // Mobilde üst üste binmemesi için toleransı azaltıyoruz, masaüstünde geçiş yumuşak kalıyor.
+                    const isMobile = window.innerWidth < 600;
+                    const margin = isMobile ? 0 : 0.06;
+
+                    const active = pct >= from && pct <= to + margin;
                     panel.classList.toggle('visible', active);
                 });
             }
@@ -440,11 +463,19 @@ function initLightbox() {
         modalImg.src = `${baseDir}${currentIndex}.png`;
         caption.textContent = `Görsel ${currentIndex} / ${totalImages}`;
 
+        // Görüntü değiştiğinde zoom'u sıfırla
+        modalImg.classList.remove('zoomed');
+
         // Update active thumb
         document.querySelectorAll('.thumb-item').forEach(t => {
             t.classList.toggle('active', parseInt(t.dataset.idx) === currentIndex);
         });
     }
+
+    // Mobil Zoom Logic (Tıklayınca büyüme/küçülme)
+    modalImg.addEventListener('click', () => {
+        modalImg.classList.toggle('zoomed');
+    });
 
     card.addEventListener('click', () => {
         modal.classList.add('active');
@@ -485,8 +516,97 @@ function initLightbox() {
 
 
 /* ───────────────────────────────────────────────────────────
+   13. FOOTER & CONTACT MODAL LOGIC
+   ─────────────────────────────────────────────────────────── */
+function initFooterLogic() {
+    const contactBtn = document.getElementById('contact-link');
+    const contactModal = document.getElementById('contact-modal');
+    const contactClose = document.getElementById('contact-close');
+    const contactOverlay = contactModal.querySelector('.modal-overlay');
+    const contactForm = document.getElementById('contact-form');
+
+    const privacyLink = document.getElementById('privacy-link');
+    const termsLink = document.getElementById('terms-link');
+
+    // Prevent jump for privacy/terms
+    [privacyLink, termsLink].forEach(link => {
+        link?.addEventListener('click', (e) => e.preventDefault());
+    });
+
+    const openContact = (e) => {
+        e.preventDefault();
+        contactModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeContact = () => {
+        contactModal.classList.remove('active');
+        document.body.style.overflow = '';
+    };
+
+    contactBtn?.addEventListener('click', openContact);
+    contactClose?.addEventListener('click', closeContact);
+    contactOverlay?.addEventListener('click', closeContact);
+
+    // Form submission simulation
+    contactForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const submitBtn = contactForm.querySelector('button');
+        const originalText = submitBtn.textContent;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Gönderiliyor...';
+
+        setTimeout(() => {
+            alert('Mesajınız başarıyla iletildi! En kısa sürede size döneceğiz.');
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+            contactForm.reset();
+            closeContact();
+        }, 1500);
+    });
+}
+
+
+/* ───────────────────────────────────────────────────────────
+   14. DOWNLOAD LOADING ANIMATION
+   ─────────────────────────────────────────────────────────── */
+function initDownloadEffect() {
+    const dlBtn = document.getElementById('main-download-btn');
+    if (!dlBtn) return;
+
+    dlBtn.addEventListener('click', function (e) {
+        // İndirme işlemini simüle etmek için 2 saniye bekletiyoruz
+        if (this.classList.contains('loading')) return;
+
+        this.classList.add('loading');
+        const inner = this.querySelector('.btn-download-inner');
+        const originalHTML = inner.innerHTML;
+
+        inner.innerHTML = `
+            <div class="btn-download-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <span style="margin-left: 10px">Hazırlanıyor...</span>
+        `;
+
+        setTimeout(() => {
+            this.classList.remove('loading');
+            inner.innerHTML = originalHTML;
+            // İndirme işlemi tarayıcı üzerinden devam eder (href zaten set edilmişti)
+        }, 2000);
+    });
+}
+
+
+
+/* ───────────────────────────────────────────────────────────
    Init
    ─────────────────────────────────────────────────────────── */
 handleScrollReveal();
 fetchLatestRelease();
 initLightbox();
+initFooterLogic();
+initDownloadEffect();

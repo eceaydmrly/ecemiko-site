@@ -2,6 +2,10 @@
    ECEMIKO — SPIDER-GWEN PREMIUM SITE
    ======================================== */
 
+html {
+    scroll-behavior: smooth;
+}
+
 :root {
     --pink: #E91E8C;
     --pink-light: #FF4DB6;
@@ -1008,9 +1012,14 @@ section {
 }
 
 .feature-card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(233, 30, 140, 0.35);
-    box-shadow: 0 32px 80px rgba(233, 30, 140, 0.12), 0 0 0 1px rgba(233, 30, 140, 0.1);
+    transform: translateY(-12px);
+    border-color: var(--pink);
+    box-shadow: 0 32px 80px rgba(233, 30, 140, 0.18), 0 0 40px rgba(233, 30, 140, 0.1);
+}
+
+.feature-card:hover h3 {
+    transform: scale(1.03);
+    color: var(--pink-light);
 }
 
 .feature-card--highlight {
@@ -1598,7 +1607,79 @@ section {
     }
 
     .hero-stats {
-        gap: 1.2rem;
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: center;
+    }
+
+    .stat-divider {
+        display: none;
+    }
+
+    /* STORY PANELS MOBILE REWRITE */
+    .story-panel {
+        left: 5% !important;
+        right: 5% !important;
+        width: 90% !important;
+        max-width: none !important;
+        top: auto !important;
+        bottom: 8% !important;
+        /* Bir tık yukarı aldım */
+        transform: translateY(20px) scale(0.95) !important;
+    }
+
+    /* 3. Panel (Merkez) Mobilde Diğerleriyle Aynı Kuralı Takip Etmeli */
+    .story-panel--center {
+        transform: translateY(20px) scale(0.95) !important;
+    }
+
+    .story-panel.visible {
+        transform: translateY(0) scale(1) !important;
+    }
+
+    .story-panel--center.visible {
+        transform: translateY(0) scale(1) !important;
+        left: 5% !important;
+        /* X-50% yerine sabit kenar payı */
+    }
+
+    .story-panel-inner {
+        padding: 1.2rem 1.4rem !important;
+        text-align: center !important;
+        max-width: 100% !important;
+        margin: 0 auto;
+        width: 100% !important;
+    }
+
+    .story-heading {
+        font-size: 1.6rem !important;
+        margin-bottom: 0.3rem !important;
+        white-space: normal !important;
+        /* Taşmayı önleyen en kritik ayar */
+    }
+
+    .story-body {
+        font-size: 0.85rem !important;
+        line-height: 1.4 !important;
+    }
+
+    .frame-counter {
+        position: fixed !important;
+        top: 100px !important;
+        right: 15px !important;
+        bottom: auto !important;
+        z-index: 1000 !important;
+        transform: scale(0.6) !important;
+        background: rgba(0, 0, 0, 0.4) !important;
+        backdrop-filter: blur(4px);
+        padding: 6px 10px;
+        border-radius: 10px;
+        pointer-events: none;
+    }
+
+    .btn-download-inner {
+        padding: 0.6rem 1rem !important;
+        font-size: 0.85rem !important;
     }
 }
 
@@ -1758,17 +1839,159 @@ section {
 
 @media (max-width: 768px) {
     .modal-content {
-        width: 95%;
-        padding: 3rem 1rem 1.5rem;
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+        padding: 4rem 1rem 2rem;
+        background: rgba(5, 2, 13, 1);
+        justify-content: center;
     }
 
+    .modal-body {
+        position: relative;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0;
+    }
+
+    .modal-img-container {
+        width: 100% !important;
+        margin: 0;
+    }
+
+    .modal-img-container img {
+        max-height: 55vh !important;
+        object-fit: contain;
+        transition: transform 0.4s var(--ease-out);
+        cursor: zoom-in;
+    }
+
+    .modal-img-container img.zoomed {
+        transform: scale(1.5);
+        cursor: zoom-out;
+        z-index: 50;
+    }
+
+    /* Yakınlaştığında butonları arkada tutalım */
+    .modal-img-container img.zoomed~.nav-btn {
+        opacity: 0.2;
+    }
+
+    /* Ok tuşlarını resmin üzerine alalım ki yer kazanalım */
     .nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
         width: 44px;
         height: 44px;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.4);
+    }
+
+    #prev-btn {
+        left: -10px;
+    }
+
+    #next-btn {
+        right: -10px;
+    }
+
+    .modal-thumbnails {
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+        /* Mobilde alta kayabilsinler */
+        gap: 0.5rem;
+        max-height: 15vh;
+        overflow-y: auto;
     }
 
     .thumb-item {
-        width: 60px;
-        height: 38px;
+        width: 50px;
+        height: 32px;
     }
+
+    .image-caption {
+        font-size: 0.7rem;
+        letter-spacing: 0.1rem;
+        margin-top: 1rem;
+    }
+}
+
+/* ============ CONTACT MODAL SPECIFIC ============ */
+.contact-content {
+    max-width: 500px !important;
+    padding: 3.5rem 3rem 3rem !important;
+    background: rgba(15, 12, 25, 0.95) !important;
+    backdrop-filter: blur(25px) !important;
+}
+
+.contact-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.contact-header h2 {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05rem;
+}
+
+.contact-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.contact-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.contact-form input,
+.contact-form textarea {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.2rem;
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    border-color: var(--pink);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 15px rgba(233, 30, 140, 0.2);
+}
+
+/* ============ DOWNLOAD BTN LOADING STATE ============ */
+.btn-download.loading {
+    pointer-events: none;
+    opacity: 0.8;
+    transform: scale(0.96);
+}
+
+.btn-download.loading .btn-download-icon svg {
+    animation: btn-spin 1s linear infinite;
+}
+
+@keyframes btn-spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* LIVE BADGE REMOVAL (Extra Safety) */
+.hero-float-card {
+    display: none !important;
 }
