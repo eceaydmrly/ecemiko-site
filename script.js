@@ -84,13 +84,11 @@ function renderFrame(idx) {
     const ch = canvas.height;
     const iw = img.naturalWidth, ih = img.naturalHeight;
 
-    // Use medium (Bilinear) filtering instead of high (Lanczos).
-    // Lanczos forcefully over-sharpens constraints, heavily exposing JPG artifacts and pixelation. 
-    // Bilinear smoothly interpolates pixels, softening the low-res edges.
+    // Use highest quality (Lanczos/Bicubic) interpolation for scaling
     ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'medium';
+    ctx.imageSmoothingQuality = 'high';
 
-    // Cover scale mathematically mapped to absolute resolution
+    // Tam Kaplama (Cover) moduna geri dönüldü: Resim ekranı tamamen, büyük bir şekilde kaplar.
     const scale = Math.max(cw / iw, ch / ih);
     const dw = iw * scale, dh = ih * scale;
 
