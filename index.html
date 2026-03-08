@@ -34,10 +34,10 @@
             <ul class="nav-links">
                 <li><a href="#hero" class="nav-link">Ana Sayfa</a></li>
                 <li><a href="#features" class="nav-link">Özellikler</a></li>
-                <li><a href="#download" class="nav-link">İndir</a></li>
+                <li><a href="#download" class="nav-link auth-dynamic-btn">İndir</a></li>
             </ul>
             <div class="nav-cta">
-                <a href="#download" class="btn-nav">İndir</a>
+                <a href="#download" class="btn-nav auth-dynamic-btn" id="nav-download-btn">İndir</a>
             </div>
         </div>
     </nav>
@@ -57,7 +57,7 @@
             <p class="hero-subtitle">Aldığın 1 oyundan fazlasını veren<br />benzersiz launcher uygulaması
             </p>
             <div class="hero-cta-group">
-                <a href="#download" class="btn-primary" id="hero-download-btn">
+                <a href="#download" class="btn-primary auth-dynamic-btn" id="hero-download-btn">
                     <span class="btn-text">Hemen İndir</span>
                     <span class="btn-arrow">→</span>
                     <div class="btn-glow"></div>
@@ -352,7 +352,7 @@
     </section>
 
     <!-- ===================== DOWNLOAD ===================== -->
-    <section id="download">
+    <section id="download" class="auth-required">
         <div class="download-bg-blobs">
             <div class="blob blob-1"></div>
             <div class="blob blob-2"></div>
@@ -478,6 +478,29 @@
     </footer>
 
     <!-- GSAP for Butter-Smooth Scroll Triggering via Canvas -->
+    <!-- ===================== AUTH MODAL ===================== -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content auth-content">
+            <div class="auth-header">
+                <div class="auth-icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+                <h2>Erişim Kodunu Gir</h2>
+                <p>Uygulamayı indirmek için size verilen özel yetki kodunu kullanın.</p>
+            </div>
+            <div class="auth-input-group">
+                <input type="text" id="auth-code-input" placeholder="ECW-XXXX" maxlength="8">
+                <button id="auth-submit-btn" class="btn-primary">Giriş Yap</button>
+            </div>
+            <p id="auth-error" class="auth-error-msg">Geçersiz kod! Lütfen tekrar deneyiniz.</p>
+            <button id="auth-skip-btn" class="auth-skip">Kodu sonra gireceğim, siteye göz atayım</button>
+        </div>
+    </div>
+
     <!-- ===================== CONTACT MODAL ===================== -->
     <div id="contact-modal" class="modal">
         <div class="modal-overlay"></div>

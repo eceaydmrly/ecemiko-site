@@ -603,6 +603,118 @@ function initDownloadEffect() {
 
 
 /* ───────────────────────────────────────────────────────────
+   14. AUTH LOGIC (Kod Sistemi)
+   ─────────────────────────────────────────────────────────── */
+function initAuthLogic() {
+    const validCodes = [
+        "ECW-A3X7", "ECW-M9R2", "ECW-K4F8", "ECW-P7Y3", "ECW-T2W5",
+        "ECW-H8N4", "ECW-B5J9", "ECW-C6V2", "ECW-D3M7", "ECW-E9K4",
+        "ECW-G2P8", "ECW-Q5T3", "ECW-R7H6", "ECW-S4B2", "ECW-U8C9",
+        "ECW-V3D5", "ECW-W9E7", "ECW-X2G4", "ECW-Y6Q8", "ECW-Z4R3",
+        "ECW-F7S5", "ECW-J2U9", "ECW-N8V4", "ECW-A5W2", "ECW-M3X8",
+        "ECW-K9Y4", "ECW-P2Z7", "ECW-T6A3", "ECW-H4B9", "ECW-B8C5",
+        "ECW-C3D2", "ECW-D7E6", "ECW-E2G9", "ECW-G5H4", "ECW-Q9J2",
+        "ECW-R4K8", "ECW-S8M3", "ECW-U3N7", "ECW-V7P2", "ECW-W4Q6",
+        "ECW-X9R5", "ECW-Y2S8", "ECW-Z6T4", "ECW-F3U2", "ECW-J8V7",
+        "ECW-N5W3", "ECW-A9X2", "ECW-M4Y6", "ECW-K2Z8", "ECW-P6A5",
+        "ECW-T3B9", "ECW-H7C4", "ECW-B2D8", "ECW-C9E3", "ECW-D4G7",
+        "ECW-E8H2", "ECW-G3J6", "ECW-Q7K4", "ECW-R2M9", "ECW-S5N3",
+        "ECW-U9P8", "ECW-V4Q2", "ECW-W8R7", "ECW-X3S5", "ECW-Y7T2",
+        "ECW-Z2U9", "ECW-F6V4", "ECW-J3W8", "ECW-N9X5", "ECW-A4Y2",
+        "ECW-M8Z6", "ECW-K5A3", "ECW-P9B7", "ECW-T4C2", "ECW-H2D9",
+        "ECW-B7E4", "ECW-C4G8", "ECW-D9H3", "ECW-E5J2", "ECW-G8K7",
+        "ECW-Q2M5", "ECW-R6N9", "ECW-S3P4", "ECW-U7Q2", "ECW-V2R8",
+        "ECW-W5S3", "ECW-X8T7", "ECW-Y4U2", "ECW-Z9V5", "ECW-F2W8",
+        "ECW-J7X4", "ECW-N3Y9", "ECW-A8Z2", "ECW-M5A7", "ECW-K3B4",
+        "ECW-P8C9", "ECW-T2D5", "ECW-H9E2", "ECW-B4G6", "ECW-C7H8"
+    ];
+
+    const modal = document.getElementById('auth-modal');
+    const input = document.getElementById('auth-code-input');
+    const submitBtn = document.getElementById('auth-submit-btn');
+    const skipBtn = document.getElementById('auth-skip-btn');
+    const errorMsg = document.getElementById('auth-error');
+    const dynamicBtns = document.querySelectorAll('.auth-dynamic-btn');
+
+    function updateUIState(isAuthenticated) {
+        if (isAuthenticated) {
+            document.body.classList.add('authenticated');
+            dynamicBtns.forEach(btn => {
+                if (btn.id === 'nav-download-btn') btn.textContent = 'İndir';
+                if (btn.id === 'hero-download-btn') {
+                    const textEl = btn.querySelector('.btn-text');
+                    if (textEl) textEl.textContent = 'Hemen İndir';
+                }
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            });
+        } else {
+            document.body.classList.remove('authenticated');
+            dynamicBtns.forEach(btn => {
+                if (btn.id === 'nav-download-btn') btn.textContent = 'Kod ile Giriş Yap';
+                if (btn.id === 'hero-download-btn') {
+                    const textEl = btn.querySelector('.btn-text');
+                    if (textEl) textEl.textContent = 'Kod ile Giriş Yap';
+                }
+            });
+        }
+    }
+
+    // Başlangıç kontrolü
+    const savedCode = localStorage.getItem('ecemiko_auth_code');
+    updateUIState(!!savedCode && validCodes.includes(savedCode));
+
+    if (!savedCode) {
+        setTimeout(() => modal.classList.add('active'), 1200);
+    }
+
+    // Buton tıklama mantığı (Eğer yetki yoksa modali aç)
+    dynamicBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            if (!document.body.classList.contains('authenticated')) {
+                e.preventDefault();
+                modal.classList.add('active');
+            }
+        });
+    });
+
+    submitBtn.addEventListener('click', () => {
+        const code = input.value.trim().toUpperCase();
+
+        // "Kullanılmış Kodlar" kontrolü (Simüle edilmiş - localStorage üzerinde tutulur)
+        let usedCodes = JSON.parse(localStorage.getItem('ecemiko_used_codes') || '[]');
+
+        if (usedCodes.includes(code)) {
+            errorMsg.textContent = "Bu kod daha önce kullanılmış!";
+            errorMsg.classList.add('visible');
+            input.classList.add('shake');
+            setTimeout(() => input.classList.remove('shake'), 400);
+            return;
+        }
+
+        if (validCodes.includes(code)) {
+            // Kodu kullanıldı olarak işaretle
+            usedCodes.push(code);
+            localStorage.setItem('ecemiko_used_codes', JSON.stringify(usedCodes));
+            localStorage.setItem('ecemiko_auth_code', code);
+
+            updateUIState(true);
+            modal.classList.remove('active');
+            errorMsg.classList.remove('visible');
+        } else {
+            errorMsg.textContent = "Geçersiz kod! Lütfen tekrar deneyiniz.";
+            errorMsg.classList.add('visible');
+            input.classList.add('shake');
+            setTimeout(() => input.classList.remove('shake'), 400);
+        }
+    });
+
+    skipBtn.addEventListener('click', () => modal.classList.remove('active'));
+    input.addEventListener('keypress', (e) => { if (e.key === 'Enter') submitBtn.click(); });
+}
+
+
+/* ───────────────────────────────────────────────────────────
    Init
    ─────────────────────────────────────────────────────────── */
 handleScrollReveal();
@@ -610,3 +722,4 @@ fetchLatestRelease();
 initLightbox();
 initFooterLogic();
 initDownloadEffect();
+initAuthLogic();
