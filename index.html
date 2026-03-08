@@ -37,7 +37,14 @@
                 <li><a href="#download" class="nav-link auth-dynamic-btn">İndir</a></li>
             </ul>
             <div class="nav-cta">
-                <a href="#download" class="btn-nav auth-dynamic-btn" id="nav-download-btn">İndir</a>
+                <div id="user-profile" class="user-profile-nav" style="display: none;">
+                    <img id="user-photo" src="" alt="User">
+                    <span id="user-name"></span>
+                    <button id="logout-btn" class="logout-minimal">Çıkış</button>
+                </div>
+                <button id="nav-auth-trigger" class="btn-nav">Giriş Yap</button>
+                <a href="#download" class="btn-nav auth-dynamic-btn" id="nav-download-btn"
+                    style="display: none;">İndir</a>
             </div>
         </div>
     </nav>
@@ -478,7 +485,35 @@
     </footer>
 
     <!-- GSAP for Butter-Smooth Scroll Triggering via Canvas -->
-    <!-- ===================== AUTH MODAL ===================== -->
+    <!-- ===================== LOGIN/REGISTER MODAL ===================== -->
+    <div id="login-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content auth-content">
+            <div class="auth-header">
+                <h2>Hoş Geldiniz</h2>
+                <p>Ecemiko dünyasına katılmak için giriş yapın.</p>
+            </div>
+
+            <div class="auth-methods">
+                <button id="google-login-btn" class="btn-google">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" alt="Google">
+                    Google ile Devam Et
+                </button>
+
+                <div class="auth-divider"><span>Veya</span></div>
+
+                <div class="auth-input-group">
+                    <input type="email" id="login-email" placeholder="E-posta Adresi">
+                    <input type="password" id="login-password" placeholder="Şifre">
+                    <button id="email-login-btn" class="btn-primary">Giriş Yap / Kayıt Ol</button>
+                </div>
+            </div>
+            <p id="login-error" class="auth-error-msg"></p>
+            <button id="login-skip-btn" class="auth-skip">Sadece siteye göz at</button>
+        </div>
+    </div>
+
+    <!-- ===================== CODE AUTH MODAL (2nd Step) ===================== -->
     <div id="auth-modal" class="modal">
         <div class="modal-overlay"></div>
         <div class="modal-content auth-content">
@@ -489,15 +524,14 @@
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
                 </div>
-                <h2>Erişim Kodunu Gir</h2>
-                <p>Uygulamayı indirmek için size verilen özel yetki kodunu kullanın.</p>
+                <h2>Son Bir Adım!</h2>
+                <p>Hesabınız doğrulandı. Şimdi erişim kodunuzu girin.</p>
             </div>
             <div class="auth-input-group">
                 <input type="text" id="auth-code-input" placeholder="ECW-XXXX" maxlength="8">
-                <button id="auth-submit-btn" class="btn-primary">Giriş Yap</button>
+                <button id="auth-submit-btn" class="btn-primary">Kodu Onayla</button>
             </div>
             <p id="auth-error" class="auth-error-msg">Geçersiz kod! Lütfen tekrar deneyiniz.</p>
-            <button id="auth-skip-btn" class="auth-skip">Kodu sonra gireceğim, siteye göz atayım</button>
         </div>
     </div>
 
@@ -553,7 +587,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
-    <script src="script.js?v=11"></script>
+    <!-- Firebase App/Database/Auth SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+    <script src="script.js?v=13"></script>
 </body>
 
 </html>

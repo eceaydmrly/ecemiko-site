@@ -2112,6 +2112,101 @@ body.authenticated a.btn-primary.auth-required {
     }
 }
 
+/* ============ COMPREHENSIVE AUTH STYLES ============ */
+.user-profile-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-right: 1.5rem;
+}
+
+#user-photo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--pink);
+}
+
+#user-name {
+    font-size: 0.85rem;
+    color: var(--white);
+    font-family: var(--font-display);
+}
+
+.logout-minimal {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.logout-minimal:hover {
+    background: rgba(255, 71, 87, 0.1);
+    color: #ff4757;
+    border-color: #ff4757;
+}
+
+.auth-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: white;
+    color: #1a1a1a;
+    border: none;
+    border-radius: 12px;
+    padding: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.btn-google:hover {
+    transform: translateY(-2px);
+    background: #f1f1f1;
+}
+
+.btn-google img {
+    width: 20px;
+    height: 20px;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#login-modal .auth-input-group input {
+    letter-spacing: normal !important;
+    text-align: left !important;
+}
+
+/* Fix for overlapping modals */
+.modal.active {
+    z-index: 10000;
+}
+
 @keyframes shake {
 
     0%,

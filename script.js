@@ -603,8 +603,25 @@ function initDownloadEffect() {
 
 
 /* ───────────────────────────────────────────────────────────
-   14. AUTH LOGIC (Kod Sistemi)
+   14. FIREBASE AUTH LOGIC (Kod Sistemi + Kullanıcı Girişi)
    ─────────────────────────────────────────────────────────── */
+const firebaseConfig = {
+    apiKey: "AIzaSyAgjDz7jFShKCyXJ_OkPQWe-5GOwAY1v-s",
+    authDomain: "ecemikokosite.firebaseapp.com",
+    databaseURL: "https://ecemikokosite-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "ecemikokosite",
+    storageBucket: "ecemikokosite.firebasestorage.app",
+    messagingSenderId: "643760147859",
+    appId: "1:643760147859:web:f1fd60069a3ae8c1a26c66"
+};
+
+// Initialize Firebase
+if (typeof firebase !== 'undefined') {
+    firebase.initializeApp(firebaseConfig);
+}
+const auth = typeof firebase !== 'undefined' ? firebase.auth() : null;
+const db = typeof firebase !== 'undefined' ? firebase.database() : null;
+
 function initAuthLogic() {
     const validCodes = [
         "ECW-A3X7", "ECW-M9R2", "ECW-K4F8", "ECW-P7Y3", "ECW-T2W5",
@@ -629,88 +646,134 @@ function initAuthLogic() {
         "ECW-P8C9", "ECW-T2D5", "ECW-H9E2", "ECW-B4G6", "ECW-C7H8"
     ];
 
-    const modal = document.getElementById('auth-modal');
-    const input = document.getElementById('auth-code-input');
-    const submitBtn = document.getElementById('auth-submit-btn');
-    const skipBtn = document.getElementById('auth-skip-btn');
-    const errorMsg = document.getElementById('auth-error');
-    const dynamicBtns = document.querySelectorAll('.auth-dynamic-btn');
+    // Selectors
+    const loginModal = document.getElementById('login-modal');
+    const authModal = document.getElementById('auth-modal');
+    const navAuthTrigger = document.getElementById('nav-auth-trigger');
+    const navDownloadBtn = document.getElementById('nav-download-btn');
+    const userProfileEl = document.getElementById('user-profile');
+    const userNameEl = document.getElementById('user-name');
+    const userPhotoEl = document.getElementById('user-photo');
+    const logoutBtn = document.getElementById('logout-btn');
 
-    function updateUIState(isAuthenticated) {
-        if (isAuthenticated) {
-            document.body.classList.add('authenticated');
-            dynamicBtns.forEach(btn => {
-                if (btn.id === 'nav-download-btn') btn.textContent = 'İndir';
-                if (btn.id === 'hero-download-btn') {
-                    const textEl = btn.querySelector('.btn-text');
-                    if (textEl) textEl.textContent = 'Hemen İndir';
-                }
-                btn.style.opacity = '1';
-                btn.style.pointerEvents = 'auto';
-            });
+    const googleBtn = document.getElementById('google-login-btn');
+    const emailLoginBtn = document.getElementById('email-login-btn');
+    const loginEmailInput = document.getElementById('login-email');
+    const loginPassInput = document.getElementById('login-password');
+    const loginError = document.getElementById('login-error');
+
+    const codeInput = document.getElementById('auth-code-input');
+    const codeSubmitBtn = document.getElementById('auth-submit-btn');
+    const codeError = document.getElementById('auth-error');
+
+    function updateNavUI(user) {
+        if (user) {
+            navAuthTrigger.style.display = 'none';
+            userProfileEl.style.display = 'flex';
+            userNameEl.textContent = user.displayName || user.email.split('@')[0];
+            userPhotoEl.src = user.photoURL || 'https://www.gravatar.com/avatar/0000?d=mp';
+
+            // Kullanıcı girmiş ama kod girmemiş mi?
+            const savedCode = localStorage.getItem('ecemiko_auth_code_' + user.uid);
+            if (savedCode) {
+                document.body.classList.add('authenticated');
+                navDownloadBtn.style.display = 'inline-flex';
+                navDownloadBtn.textContent = 'İndir';
+            } else {
+                document.body.classList.remove('authenticated');
+                navDownloadBtn.style.display = 'inline-flex';
+                navDownloadBtn.textContent = 'Kodu Gir';
+            }
         } else {
+            navAuthTrigger.style.display = 'inline-flex';
+            userProfileEl.style.display = 'none';
+            navDownloadBtn.style.display = 'none';
             document.body.classList.remove('authenticated');
-            dynamicBtns.forEach(btn => {
-                if (btn.id === 'nav-download-btn') btn.textContent = 'Kod ile Giriş Yap';
-                if (btn.id === 'hero-download-btn') {
-                    const textEl = btn.querySelector('.btn-text');
-                    if (textEl) textEl.textContent = 'Kod ile Giriş Yap';
-                }
-            });
         }
     }
 
-    // Başlangıç kontrolü
-    const savedCode = localStorage.getItem('ecemiko_auth_code');
-    updateUIState(!!savedCode && validCodes.includes(savedCode));
+    // Google ile Giriş
+    googleBtn.onclick = () => {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider).catch(e => loginError.textContent = e.message);
+    };
 
-    if (!savedCode) {
-        setTimeout(() => modal.classList.add('active'), 1200);
-    }
+    // E-posta ile Giriş/Kayıt
+    emailLoginBtn.onclick = () => {
+        const email = loginEmailInput.value.trim();
+        const pass = loginPassInput.value.trim();
+        if (!email || !pass) return;
 
-    // Buton tıklama mantığı (Eğer yetki yoksa modali aç)
-    dynamicBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            if (!document.body.classList.contains('authenticated')) {
-                e.preventDefault();
-                modal.classList.add('active');
-            }
-        });
-    });
+        auth.signInWithEmailAndPassword(email, pass).catch(() => {
+            return auth.createUserWithEmailAndPassword(email, pass);
+        }).catch(e => loginError.textContent = e.message);
+    };
 
-    submitBtn.addEventListener('click', () => {
-        const code = input.value.trim().toUpperCase();
+    // Kod Doğrulama
+    codeSubmitBtn.onclick = async () => {
+        const user = auth.currentUser;
+        if (!user) return;
 
-        // "Kullanılmış Kodlar" kontrolü (Simüle edilmiş - localStorage üzerinde tutulur)
-        let usedCodes = JSON.parse(localStorage.getItem('ecemiko_used_codes') || '[]');
-
-        if (usedCodes.includes(code)) {
-            errorMsg.textContent = "Bu kod daha önce kullanılmış!";
-            errorMsg.classList.add('visible');
-            input.classList.add('shake');
-            setTimeout(() => input.classList.remove('shake'), 400);
+        const code = codeInput.value.trim().toUpperCase();
+        if (!validCodes.includes(code)) {
+            codeError.textContent = "Geçersiz kod!";
+            codeError.classList.add('visible');
             return;
         }
 
-        if (validCodes.includes(code)) {
-            // Kodu kullanıldı olarak işaretle
-            usedCodes.push(code);
-            localStorage.setItem('ecemiko_used_codes', JSON.stringify(usedCodes));
-            localStorage.setItem('ecemiko_auth_code', code);
+        codeSubmitBtn.disabled = true;
+        try {
+            const snapshot = await db.ref('used_codes/' + code.replace(/\./g, '_')).get();
+            if (snapshot.exists()) {
+                codeError.textContent = "Bu kod daha önce kullanılmış!";
+                codeError.classList.add('visible');
+            } else {
+                await db.ref('used_codes/' + code.replace(/\./g, '_')).set({
+                    usedAt: firebase.database.ServerValue.TIMESTAMP,
+                    userId: user.uid
+                });
+                localStorage.setItem('ecemiko_auth_code_' + user.uid, code);
+                document.body.classList.add('authenticated');
+                authModal.classList.remove('active');
+                updateNavUI(user);
+            }
+        } catch (e) {
+            codeError.textContent = "Bağlantı hatası!";
+            codeError.classList.add('visible');
+        } finally {
+            codeSubmitBtn.disabled = false;
+        }
+    };
 
-            updateUIState(true);
-            modal.classList.remove('active');
-            errorMsg.classList.remove('visible');
-        } else {
-            errorMsg.textContent = "Geçersiz kod! Lütfen tekrar deneyiniz.";
-            errorMsg.classList.add('visible');
-            input.classList.add('shake');
-            setTimeout(() => input.classList.remove('shake'), 400);
+    // Auth State Observer
+    auth.onAuthStateChanged(user => {
+        updateNavUI(user);
+        if (user) {
+            loginModal.classList.remove('active');
+            const savedCode = localStorage.getItem('ecemiko_auth_code_' + user.uid);
+            if (!savedCode) {
+                setTimeout(() => authModal.classList.add('active'), 800);
+            }
         }
     });
 
-    skipBtn.addEventListener('click', () => modal.classList.remove('active'));
-    input.addEventListener('keypress', (e) => { if (e.key === 'Enter') submitBtn.click(); });
+    navAuthTrigger.onclick = () => loginModal.classList.add('active');
+    navDownloadBtn.onclick = (e) => {
+        if (!document.body.classList.contains('authenticated')) {
+            e.preventDefault();
+            authModal.classList.add('active');
+        }
+    };
+
+    logoutBtn.onclick = () => auth.signOut();
+    document.getElementById('login-skip-btn').onclick = () => loginModal.classList.remove('active');
+
+    // Tıklandığında overlay kapatma
+    document.querySelectorAll('.modal-overlay').forEach(ov => {
+        ov.onclick = () => {
+            ov.parentElement.classList.remove('active');
+        }
+    });
 }
 
 
