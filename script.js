@@ -607,10 +607,10 @@ function initDownloadEffect() {
    ─────────────────────────────────────────────────────────── */
 const firebaseConfig = {
     apiKey: "AIzaSyAgjDz7jFShKCyXJ_OkPQWe-5GOwAY1v-s",
-    authDomain: "ecemikosites.firebaseapp.com",
-    databaseURL: "https://ecemikosites-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "ecemikosites",
-    storageBucket: "ecemikosites.firebasestorage.app",
+    authDomain: "ecemikokosite.firebaseapp.com",
+    databaseURL: "https://ecemikokosite-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "ecemikokosite",
+    storageBucket: "ecemikokosite.firebasestorage.app",
     messagingSenderId: "643760147859",
     appId: "1:643760147859:web:f1fd60069a3ae8c1a26c66"
 };
