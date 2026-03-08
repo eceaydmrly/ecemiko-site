@@ -714,7 +714,9 @@ function initAuthLogic() {
             } else if (e.code === 'auth/unauthorized-domain') {
                 loginError.textContent = "HATA: " + window.location.hostname + " alanı Firebase'de yetkilendirilmemiş!";
             } else if (e.code === 'auth/operation-not-allowed') {
-                loginError.textContent = "HATA: Firebase panelinde Google Girişi aktif değil.";
+                loginError.textContent = "HATA: Firebase panelinden Google Girişi aktif değil.";
+            } else if (e.code === 'auth/operation-not-supported-in-this-environment') {
+                loginError.textContent = "HATA: Local dosya üzerinden (file://) giriş yapılamaz. Lütfen siteyi bir sunucu (Live Server) ile açın veya Vercel linkinde test edin.";
             } else {
                 loginError.textContent = "Sistem Hatası: " + e.code;
             }
