@@ -42,8 +42,8 @@ window.addEventListener('scroll', () => {
     navbar.classList.toggle('scrolled', window.scrollY > 20);
 }, { passive: true });
 
-// Smooth scroll for navbar links with height offset
-document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
+// Smooth scroll for navbar and hero links with height offset
+document.querySelectorAll('.nav-links a[href^="#"], .hero-cta-group a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const targetId = this.getAttribute('href');
@@ -51,7 +51,12 @@ document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
         if (!targetEl) return;
 
         const navHeight = navbar.offsetHeight || 80;
-        const targetPos = targetEl.getBoundingClientRect().top + window.pageYOffset - navHeight;
+        
+        // Counteract the initial translateY(50px) hidden state of .reveal sections
+        // and add extra ceiling padding so the header breathes perfectly under the navbar
+        let extraOffset = targetEl.classList.contains('reveal') ? 60 : 20;
+
+        const targetPos = targetEl.getBoundingClientRect().top + window.pageYOffset - navHeight - extraOffset;
 
         window.scrollTo({
             top: targetPos,
@@ -386,8 +391,6 @@ async function fetchLatestRelease() {
 
         if (exeAsset && dlBtn) {
             dlBtn.href = exeAsset.browser_download_url;
-            // Also update the hero section download button to anchor correctly
-            if (heroBtn) heroBtn.href = "#download";
         }
 
         if (titleEl) {

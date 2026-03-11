@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="style.css?v=3" />
+    <link rel="stylesheet" href="style.css?v=16" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
 </head>
 
@@ -35,6 +35,9 @@
             <ul class="nav-links">
                 <li><a href="#hero" class="nav-link">Ana Sayfa</a></li>
                 <li><a href="#features" class="nav-link">Özellikler</a></li>
+                <li><a href="#pricing" class="nav-link"
+                        style="color: var(--pink); font-weight: 700; text-shadow: 0 0 10px rgba(233, 30, 140, 0.5);">Satın
+                        Al</a></li>
                 <li><a href="#download" class="nav-link auth-dynamic-btn">İndir</a></li>
             </ul>
             <div class="nav-cta">
@@ -92,8 +95,8 @@
             <p class="hero-subtitle">Aldığın 1 oyundan fazlasını veren<br />benzersiz launcher uygulaması
             </p>
             <div class="hero-cta-group">
-                <a href="#download" class="btn-primary auth-dynamic-btn" id="hero-download-btn">
-                    <span class="btn-text">Hemen İndir</span>
+                <a href="#pricing" class="btn-primary" id="hero-download-btn">
+                    <span class="btn-text">Satın Al</span>
                     <span class="btn-arrow">→</span>
                     <div class="btn-glow"></div>
                 </a>
@@ -396,6 +399,81 @@
         </div>
     </section>
 
+    <!-- ===================== PRICING ===================== -->
+    <section id="pricing" class="reveal">
+        <div class="pricing-bg-blobs">
+            <!-- Reuse blob styling from download for thematic consistency -->
+            <div class="blob blob-1"></div>
+            <div class="blob blob-3"></div>
+        </div>
+        <div class="section-header">
+            <div class="section-badge"
+                style="background: rgba(233, 30, 140, 0.1); color: var(--pink); border-color: rgba(233, 30, 140, 0.3);">
+                SATIN AL</div>
+            <h2 class="section-title">En Uygun Paketi <span class="highlight">Seç</span></h2>
+            <p class="section-desc">Hem bütçe dostu hem de sınırsız güç. Kusursuz deneyim için sana uygun olanı hemen
+                al.</p>
+        </div>
+
+        <div class="pricing-container">
+            <!-- Paket 1: Aylık -->
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <div class="package-title-row">
+                        <i class="far fa-calendar-alt package-icon"></i>
+                        <h3 class="package-name">1 Aylık Paket</h3>
+                    </div>
+                    <div class="package-badge-inline" style="background: linear-gradient(90deg, #4f46e5, #7c3aed);">Başlangıç</div>
+                </div>
+                <p class="package-subtitle">Kısa süreli kullanım için uygun</p>
+
+                <div class="package-price-box">
+                    <div class="package-price-value">350<span class="price-currency">.00 ₺</span></div>
+                    <div class="package-price-sub">KDV dahildir</div>
+                </div>
+
+                <div class="pricing-features">
+                    <ul>
+                        <li><i class="fas fa-check"></i> Anında Teslimat</li>
+                        <li><i class="fas fa-check"></i> 1 Aylık Kesintisiz VIP Erişim</li>
+                        <li><i class="fas fa-check"></i> 7/24 Kesintisiz Çok Özel Destek</li>
+                        <li><i class="fas fa-check"></i> Yeni Sürümlere Ücretsiz Erişim</li>
+                    </ul>
+                </div>
+                <a href="https://www.shopier.com/Ecemikko/45092463" target="_blank" class="btn-pricing"><i class="far fa-credit-card" style="margin-right: 8px;"></i> Satın Al</a>
+            </div>
+
+            <!-- Paket 2: Sınırsız -->
+            <div class="pricing-card pricing-card-premium">
+                <div class="pricing-header">
+                    <div class="package-title-row">
+                        <i class="fas fa-infinity package-icon" style="color: #ffd700;"></i>
+                        <h3 class="package-name"
+                            style="background: linear-gradient(135deg, #ffd700, #fff); -webkit-background-clip: text; background-clip: text; color: transparent;">
+                            Sınırsız Paket</h3>
+                    </div>
+                    <div class="package-badge-inline">En Avantajlı</div>
+                </div>
+                <p class="package-subtitle">Ömür boyu kusursuz abonelik tasarrufu</p>
+
+                <div class="package-price-box">
+                    <div class="package-price-value" style="color: #ffd700;">1200<span class="price-currency">.00 ₺</span></div>
+                    <div class="package-price-sub" style="color: rgba(255,215,0,0.6);">KDV dahildir</div>
+                </div>
+
+                <div class="pricing-features">
+                    <ul>
+                        <li><i class="fas fa-check"></i> Ömür Boyu Limitsiz Teslimat</li>
+                        <li><i class="fas fa-check"></i> Sınırsız Süre Oynayış</li>
+                        <li><i class="fas fa-check"></i> Özel VIP Rol & Acil Destek</li>
+                        <li><i class="fas fa-check"></i> Yeni Özelliklere Erken Sınırsız Erişim</li>
+                    </ul>
+                </div>
+                <a href="https://www.shopier.com/Ecemikko/45092509" target="_blank" class="btn-pricing btn-pricing-premium"><i class="far fa-credit-card" style="margin-right: 8px;"></i> Satın Al</a>
+            </div>
+        </div>
+    </section>
+
     <!-- ===================== DOWNLOAD ===================== -->
     <section id="download" class="auth-required">
         <div class="download-bg-blobs">
@@ -673,7 +751,7 @@
                 <p>Soruların veya önerilerin için bize yazabilirsin.</p>
             </div>
             <form class="contact-form" id="contact-form">
-                <input type="text" placeholder="Adın Soyadın" required>
+                <input type="text" placeholder="İsmin / Kullanıcı Adın" required>
                 <input type="email" placeholder="E-posta Adresin" required>
                 <textarea placeholder="Mesajın..." rows="4" required></textarea>
                 <button type="submit" class="btn-primary">Gönder</button>
@@ -722,7 +800,7 @@
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <script src="script.js?v=13"></script>
+    <script src="script.js?v=17"></script>
 </body>
 
 </html>
