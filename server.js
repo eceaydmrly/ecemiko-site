@@ -171,3 +171,6 @@ app.get('/api/download-app', authenticateToken, (req, res) => {
 app.listen(port, () => {
     console.log(`Ecemiko secure server running on port ${port}`);
 });
+
+// Export for Vercel Serverless
+module.exports = app;
