@@ -1,0 +1,25 @@
+{
+  "name": "ecemiko-site",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">\r   <img src=\"ezgif-821fab6a50df84fa-jpg/ezgif-frame-001.jpg\" alt=\"Ecemiko Banner\" width=\"100%\">",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.13.6",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "firebase": "^12.11.0",
+    "firebase-admin": "^13.7.0",
+    "form-data": "^4.0.5",
+    "formdata-node": "^6.0.3",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1"
+  }
+}

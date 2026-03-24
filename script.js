@@ -51,7 +51,7 @@ document.querySelectorAll('.nav-links a[href^="#"], .hero-cta-group a[href^="#"]
         if (!targetEl) return;
 
         const navHeight = navbar.offsetHeight || 80;
-        
+
         // Counteract the initial translateY(50px) hidden state of .reveal sections
         // and add extra ceiling padding so the header breathes perfectly under the navbar
         let extraOffset = targetEl.classList.contains('reveal') ? 60 : 20;
@@ -386,13 +386,6 @@ async function fetchLatestRelease() {
         const dateEl = document.getElementById('release-date');
         const heroBtn = document.getElementById('hero-download-btn');
 
-        // Find the first .exe asset
-        const exeAsset = data.assets.find(asset => asset.name.endsWith('.exe'));
-
-        if (exeAsset && dlBtn) {
-            dlBtn.href = exeAsset.browser_download_url;
-        }
-
         if (titleEl) {
             titleEl.textContent = `Ecemiko Launcher ${data.tag_name}`;
         }
@@ -595,11 +588,43 @@ function initDownloadEffect() {
             <span style="margin-left: 10px">Hazırlanıyor...</span>
         `;
 
-        setTimeout(() => {
+        setTimeout(async () => {
             this.classList.remove('loading');
             inner.innerHTML = originalHTML;
-            // İndirme işlemi tarayıcı üzerinden devam eder (href zaten set edilmişti)
-        }, 2000);
+
+            // Initiate authenticated download
+            const token = localStorage.getItem('ecemiko_premium_token');
+            if (token) {
+                try {
+                    const response = await fetch('/api/download-app', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        // Parse the blob to make the browser download it without navigating away
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        // Extract filename from Content-Disposition if available, or just use default
+                        a.download = 'Lucy V2.0.0.exe';
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                    } else {
+                        const errData = await response.json();
+                        alert("İndirme Hatası: " + (errData.message || "Bilinmeyen bir hata oluştu"));
+                    }
+                } catch (error) {
+                    alert("Bağlantı Hatası!");
+                }
+            } else {
+                authModal.classList.add('active');
+            }
+        }, 800);
     });
 }
 
@@ -623,8 +648,21 @@ if (typeof firebase !== 'undefined') {
     firebase.initializeApp(firebaseConfig);
 }
 const auth = typeof firebase !== 'undefined' ? firebase.auth() : null;
-const db = typeof firebase !== 'undefined' ? firebase.database() : null;
-const IMGBB_API_KEY = "c18bc77ca0f6844dc5d500012ad7ea3e"; // User's private API key
+
+// TROLL FAKE KEYS FOR HACKERS WHO LIKE TO SNOOP
+const IMGBB_API_KEY = "hahaha_nice_try_buddy_api_key_is_secure";
+const FIREBASE_ADMIN_KEY = "you_wish_this_was_real";
+const IS_ADMIN = false; // "Try changing this to true, see if I care 😂"
+const validCodes = [
+    "ECW-N1C3-TRY0", "ECW-G3T-R3KT", "ECW-L0L-N00B", "ECW-H4CK3R-M4N"
+]; // Fake array to bait hackers
+
+// Console message for developers/snoopers
+console.log("%c🚨 DİKKAT 🚨", "color: red; font-size: 50px; font-weight: bold; text-shadow: 2px 2px 0 #000;");
+console.log("%cBurada bulabileceğin tek şey benim mükemmel kodlarım. Eski açıklar kapatıldı, boşa uğraşma defolll", "color: #E91E8C; font-size: 16px; font-weight: bold;");
+
+// Troll localStorage
+localStorage.setItem('hacker_status', 'detected_calling_fbi_now...');
 
 function initAuthLogic() {
     // --- PROFILE DROPDOWN & SETTINGS LOGIC ---
@@ -749,7 +787,7 @@ function initAuthLogic() {
             photoCropStep.style.display = 'none';
 
             try {
-                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                const response = await fetch('/api/upload-image', {
                     method: 'POST',
                     body: formData
                 });
@@ -850,30 +888,8 @@ function initAuthLogic() {
     };
 
 
-    const validCodes = [
-        "ECW-A3X7", "ECW-M9R2", "ECW-K4F8", "ECW-P7Y3", "ECW-T2W5",
-        "ECW-H8N4", "ECW-B5J9", "ECW-C6V2", "ECW-D3M7", "ECW-E9K4",
-        "ECW-G2P8", "ECW-Q5T3", "ECW-R7H6", "ECW-S4B2", "ECW-U8C9",
-        "ECW-V3D5", "ECW-W9E7", "ECW-X2G4", "ECW-Y6Q8", "ECW-Z4R3",
-        "ECW-F7S5", "ECW-J2U9", "ECW-N8V4", "ECW-A5W2", "ECW-M3X8",
-        "ECW-K9Y4", "ECW-P2Z7", "ECW-T6A3", "ECW-H4B9", "ECW-B8C5",
-        "ECW-C3D2", "ECW-D7E6", "ECW-E2G9", "ECW-G5H4", "ECW-Q9J2",
-        "ECW-R4K8", "ECW-S8M3", "ECW-U3N7", "ECW-V7P2", "ECW-W4Q6",
-        "ECW-X9R5", "ECW-Y2S8", "ECW-Z6T4", "ECW-F3U2", "ECW-J8V7",
-        "ECW-N5W3", "ECW-A9X2", "ECW-M4Y6", "ECW-K2Z8", "ECW-P6A5",
-        "ECW-T3B9", "ECW-H7C4", "ECW-B2D8", "ECW-C9E3", "ECW-D4G7",
-        "ECW-E8H2", "ECW-G3J6", "ECW-Q7K4", "ECW-R2M9", "ECW-S5N3",
-        "ECW-U9P8", "ECW-V4Q2", "ECW-W8R7", "ECW-X3S5", "ECW-Y7T2",
-        "ECW-Z2U9", "ECW-F6V4", "ECW-J3W8", "ECW-N9X5", "ECW-A4Y2",
-        "ECW-M8Z6", "ECW-K5A3", "ECW-P9B7", "ECW-T4C2", "ECW-H2D9",
-        "ECW-B7E4", "ECW-C4G8", "ECW-D9H3", "ECW-E5J2", "ECW-G8K7",
-        "ECW-Q2M5", "ECW-R6N9", "ECW-S3P4", "ECW-U7Q2", "ECW-V2R8",
-        "ECW-W5S3", "ECW-X8T7", "ECW-Y4U2", "ECW-Z9V5", "ECW-F2W8",
-        "ECW-J7X4", "ECW-N3Y9", "ECW-A8Z2", "ECW-M5A7", "ECW-K3B4",
-        "ECW-P8C9", "ECW-T2D5", "ECW-H9E2", "ECW-B4G6", "ECW-C7H8"
-    ];
-
-    // Selectors
+    // Valid codes removed, verification happens on the server now
+    const API_VERIFY_URL = '/api/verify-code';
     const loginModal = document.getElementById('login-modal');
     const authModal = document.getElementById('auth-modal');
     const navAuthTrigger = document.getElementById('nav-auth-trigger');
@@ -907,9 +923,9 @@ function initAuthLogic() {
             userNameEl.textContent = user.displayName || user.email.split('@')[0];
             userPhotoEl.src = user.photoURL || 'https://www.gravatar.com/avatar/0000?d=mp';
 
-            // Check for code
-            const savedCode = localStorage.getItem('ecemiko_auth_code_' + user.uid);
-            if (savedCode) {
+            // Check for code using server token
+            const jwtToken = localStorage.getItem('ecemiko_premium_token');
+            if (jwtToken) {
                 document.body.classList.add('authenticated');
                 navDownloadBtn.classList.remove('hidden-auth');
                 navDownloadBtn.textContent = 'İndir';
@@ -1057,34 +1073,33 @@ function initAuthLogic() {
     triggerClickOnEnter(document.getElementById('new-photo-url'), document.getElementById('save-photo-btn'));
 
 
-    // Kod Doğrulama
+    // Verification through backend
     codeSubmitBtn.onclick = async () => {
         const user = auth.currentUser;
         if (!user) return;
 
         const code = codeInput.value.trim().toUpperCase();
-        if (!validCodes.includes(code)) {
-            codeError.textContent = "Geçersiz kod!";
-            codeError.classList.add('visible');
-            return;
-        }
 
         codeSubmitBtn.disabled = true;
         try {
-            const snapshot = await db.ref('used_codes/' + code.replace(/\./g, '_')).get();
-            if (snapshot.exists()) {
-                codeError.textContent = "Bu kod daha önce kullanılmış!";
-                codeError.classList.add('visible');
-            } else {
-                await db.ref('used_codes/' + code.replace(/\./g, '_')).set({
-                    usedAt: firebase.database.ServerValue.TIMESTAMP,
-                    userId: user.uid
-                });
-                localStorage.setItem('ecemiko_auth_code_' + user.uid, code);
+            const res = await fetch(API_VERIFY_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: code, userId: user.uid })
+            });
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                // Instead of plain code locally, store JWT for server downloads requests
+                localStorage.setItem('ecemiko_premium_token', data.token);
                 document.body.classList.add('authenticated');
                 authModal.classList.remove('active');
                 updateNavUI(user);
+            } else {
+                codeError.textContent = data.message || "Bilinmeyen bir hata oluştu!";
+                codeError.classList.add('visible');
             }
+
         } catch (e) {
             codeError.textContent = "Bağlantı hatası!";
             codeError.classList.add('visible');
@@ -1102,9 +1117,9 @@ function initAuthLogic() {
             loginModal.classList.remove('active');
             dropdownEmail.textContent = user.email;
 
-            // Check for code
-            const savedCode = localStorage.getItem('ecemiko_auth_code_' + user.uid);
-            if (!savedCode) {
+            // Check for valid token, instead of plain text code
+            const savedToken = localStorage.getItem('ecemiko_premium_token');
+            if (!savedToken) {
                 setTimeout(() => authModal.classList.add('active'), 800);
             }
         } else {
@@ -1132,7 +1147,7 @@ function initAuthLogic() {
     document.querySelectorAll('.modal-overlay').forEach(ov => {
         ov.onclick = () => {
             ov.parentElement.classList.remove('active');
-        }
+        };
     });
 }
 
