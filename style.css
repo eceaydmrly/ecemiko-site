@@ -219,6 +219,7 @@ button, input, textarea {
     border: 1px solid var(--border);
     height: 38px;
     min-width: 130px;
+    max-width: 180px; /* Prevents overflow/stretching with long usernames */
     cursor: pointer;
     position: relative;
     transition: all 0.25s var(--ease-out);
