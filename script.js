@@ -33,6 +33,15 @@ document.querySelectorAll('a, button, .feature-card, .download-card, .story-pane
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
 });
 
+// High-Fidelity spotlight tracking coordinates
+document.querySelectorAll('.feature-card, .download-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', `${e.clientX - r.left}px`);
+        card.style.setProperty('--mouse-y', `${e.clientY - r.top}px`);
+    });
+});
+
 
 /* ───────────────────────────────────────────────────────────
    2. NAVBAR
@@ -435,7 +444,7 @@ function initLightbox() {
     const prevBtn = document.getElementById('prev-btn');
     const caption = document.getElementById('image-caption');
     const thumbsContainer = document.getElementById('modal-thumbnails');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = modal.querySelector('.modal-overlay');
 
     if (!card || !modal) return;
 
@@ -892,6 +901,7 @@ function initAuthLogic() {
     const API_VERIFY_URL = '/api/verify-code';
     const loginModal = document.getElementById('login-modal');
     const authModal = document.getElementById('auth-modal');
+    const authClose = document.getElementById('auth-close');
     const navAuthTrigger = document.getElementById('nav-auth-trigger');
     const navDownloadBtn = document.getElementById('nav-download-btn');
     const userProfileEl = document.getElementById('user-profile');
@@ -899,6 +909,13 @@ function initAuthLogic() {
     const userPhotoEl = document.getElementById('user-photo');
     const logoutBtn = document.getElementById('nav-logout-btn');
     const navEnterCode = document.getElementById('nav-enter-code');
+
+    if (authClose) {
+        authClose.onclick = () => {
+            authModal.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+    }
 
     const googleBtn = document.getElementById('google-login-btn');
     const emailLoginBtn = document.getElementById('email-login-btn');
@@ -1147,6 +1164,7 @@ function initAuthLogic() {
     document.querySelectorAll('.modal-overlay').forEach(ov => {
         ov.onclick = () => {
             ov.parentElement.classList.remove('active');
+            document.body.style.overflow = '';
         };
     });
 }

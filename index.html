@@ -14,6 +14,7 @@
         rel="stylesheet" />
     <link rel="stylesheet" href="style.css?v=16" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 
 <body>
@@ -44,14 +45,11 @@
             <ul class="nav-links">
                 <li><a href="#hero" class="nav-link">Ana Sayfa</a></li>
                 <li><a href="#features" class="nav-link">Özellikler</a></li>
-                <li><a href="#pricing" class="nav-link"
-                        style="color: var(--pink); font-weight: 700; text-shadow: 0 0 10px rgba(233, 30, 140, 0.5);">Satın
-                        Al</a></li>
+                <li><a href="#pricing" class="nav-link nav-link--accent">Satın Al</a></li>
                 <li><a href="#download" class="nav-link auth-dynamic-btn">İndir</a></li>
             </ul>
             <div class="nav-cta">
-                <div id="user-profile" class="account-premium-pill auth-required"
-                    style="display: none; cursor: pointer; position: relative;">
+                <div id="user-profile" class="account-premium-pill auth-required hidden-auth">
                     <div class="pill-avatar">
                         <img id="user-photo" src="" alt="Profil">
                     </div>
@@ -83,8 +81,7 @@
                     </div>
                 </div>
                 <button id="nav-auth-trigger" class="btn-nav">Giriş Yap</button>
-                <a href="#download" class="btn-nav auth-dynamic-btn" id="nav-download-btn"
-                    style="display: none;">İndir</a>
+                <a href="#download" class="btn-nav auth-dynamic-btn hidden-auth" id="nav-download-btn">İndir</a>
             </div>
         </div>
     </nav>
@@ -416,9 +413,7 @@
             <div class="blob blob-3"></div>
         </div>
         <div class="section-header">
-            <div class="section-badge"
-                style="background: rgba(233, 30, 140, 0.1); color: var(--pink); border-color: rgba(233, 30, 140, 0.3);">
-                SATIN AL</div>
+            <div class="section-badge section-badge--pricing">SATIN AL</div>
             <h2 class="section-title">En Uygun Paketi <span class="highlight">Seç</span></h2>
             <p class="section-desc">Hem bütçe dostu hem de sınırsız güç. Kusursuz deneyim için sana uygun olanı hemen
                 al.</p>
@@ -432,13 +427,12 @@
                         <i class="far fa-calendar-alt package-icon"></i>
                         <h3 class="package-name">1 Aylık Paket</h3>
                     </div>
-                    <div class="package-badge-inline" style="background: linear-gradient(90deg, #4f46e5, #7c3aed);">
-                        Başlangıç</div>
+                    <div class="package-badge-inline package-badge-inline--starter">Başlangıç</div>
                 </div>
                 <p class="package-subtitle">Kısa süreli kullanım için uygun</p>
 
                 <div class="package-price-box">
-                    <div class="package-price-value">350<span class="price-currency">.00 ₺</span></div>
+                    <div class="package-price-value">400<span class="price-currency">.00 ₺</span></div>
                     <div class="package-price-sub">KDV dahildir</div>
                 </div>
 
@@ -451,26 +445,24 @@
                     </ul>
                 </div>
                 <a href="https://www.shopier.com/Ecemikko/45092463" target="_blank" class="btn-pricing"><i
-                        class="far fa-credit-card" style="margin-right: 8px;"></i> Satın Al</a>
+                        class="far fa-credit-card"></i> Satın Al</a>
             </div>
 
             <!-- Paket 2: Sınırsız -->
             <div class="pricing-card pricing-card-premium">
                 <div class="pricing-header">
                     <div class="package-title-row">
-                        <i class="fas fa-infinity package-icon" style="color: #ffd700;"></i>
-                        <h3 class="package-name"
-                            style="background: linear-gradient(135deg, #ffd700, #fff); -webkit-background-clip: text; background-clip: text; color: transparent;">
-                            Sınırsız Paket</h3>
+                        <i class="fas fa-infinity package-icon package-icon--premium"></i>
+                        <h3 class="package-name package-name--unlimited">Sınırsız Paket</h3>
                     </div>
                     <div class="package-badge-inline">En Avantajlı</div>
                 </div>
                 <p class="package-subtitle">Ömür boyu kusursuz abonelik tasarrufu</p>
 
                 <div class="package-price-box">
-                    <div class="package-price-value" style="color: #ffd700;">1200<span class="price-currency">.00
+                    <div class="package-price-value package-price-value--premium">2000<span class="price-currency">.00
                             ₺</span></div>
-                    <div class="package-price-sub" style="color: rgba(255,215,0,0.6);">KDV dahildir</div>
+                    <div class="package-price-sub package-price-sub--premium">KDV dahildir</div>
                 </div>
 
                 <div class="pricing-features">
@@ -482,8 +474,7 @@
                     </ul>
                 </div>
                 <a href="https://www.shopier.com/Ecemikko/45092509" target="_blank"
-                    class="btn-pricing btn-pricing-premium"><i class="far fa-credit-card"
-                        style="margin-right: 8px;"></i> Satın Al</a>
+                    class="btn-pricing btn-pricing-premium"><i class="far fa-credit-card"></i> Satın Al</a>
             </div>
         </div>
     </section>
@@ -737,6 +728,7 @@
     <div id="auth-modal" class="modal">
         <div class="modal-overlay"></div>
         <div class="modal-content auth-content">
+            <button class="modal-close" id="auth-close">&times;</button>
             <div class="auth-header">
                 <div class="auth-icon-box">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
