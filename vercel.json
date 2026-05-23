@@ -4,6 +4,30 @@
     {
       "src": "server.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "style.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "script.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "Görseller/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "showimgs/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "ezgif-821fab6a50df84fa-jpg/**/*",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
