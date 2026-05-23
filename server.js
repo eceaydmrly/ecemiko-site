@@ -3,32 +3,41 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const multer = require('multer');
-const admin = require('firebase-admin');
 const axios = require('axios');
 const FormData = require('form-data');
 const path = require('path');
 const fs = require('fs');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Firebase Admin Setup
-// const serviceAccount = {
-//   "project_id": process.env.FIREBASE_PROJECT_ID,
-//   "private_key": process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-//   "client_email": process.env.FIREBASE_CLIENT_EMAIL,
-// };
+// Firebase SDK tamamen kaldirildi — REST API kullaniliyor (SDK persistent conn nodemailer'i blokluyor)
+// Firestore REST API config
+const FIRESTORE_PROJECT = 'ecemikouygulamakeysistemi';
+const FIRESTORE_API_KEY = 'AIzaSyADHMOGXr38ltWu6NLKG0qEagN9DQ2N3JI';
 
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount),
-//   databaseURL: "https://ecemikokosite-default-rtdb.europe-west1.firebasedatabase.app"
-// });
-
-// const db = admin.database();
+// Nodemailer transporter - startup'ta bir kere olustur, her requestte yeniden kurma
+const mailTransporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    pool: false,
+    auth: {
+        user: 'ecemikolauncher@ecemikoapp.info',
+        pass: 'qcsh nkez jijs jcyw'
+    },
+    tls: {
+        rejectUnauthorized: false
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000
+});
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(__dirname));
 
 // Rate Limiting could be added here for production
 
@@ -165,6 +174,59 @@ app.get('/api/download-app', authenticateToken, (req, res) => {
     } else {
         res.status(404).json({ success: false, message: 'Dosya bulunamadı.' });
     }
+});
+
+
+// Active Users Count — Firestore REST API (no persistent SDK connection)
+app.get('/api/active-users', async (req, res) => {
+    try {
+        const url = `https://firestore.googleapis.com/v1/projects/${FIRESTORE_PROJECT}/databases/(default)/documents:runAggregationQuery?key=${FIRESTORE_API_KEY}`;
+        const body = {
+            structuredAggregationQuery: {
+                aggregations: [{ alias: 'count', count: {} }],
+                structuredQuery: { from: [{ collectionId: 'accounts' }] }
+            }
+        };
+        const response = await axios.post(url, body, { timeout: 8000 });
+        const count = response.data?.[0]?.result?.aggregateFields?.count?.integerValue;
+        if (count !== undefined) {
+            return res.json({ success: true, count: parseInt(count) });
+        }
+        return res.status(500).json({ success: false, message: 'Count not found in response' });
+    } catch (error) {
+        console.error('Error fetching active users count:', error.message);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// Contact form email sending — fire-and-forget (respond immediately, mail in background)
+app.post('/api/contact', (req, res) => {
+    const { name, email, message } = req.body;
+    console.log('[contact] Request received from:', email);
+
+    if (!name || !email || !message) {
+        return res.status(400).json({ success: false, message: 'Lutfen tum alanlari doldurun.' });
+    }
+
+    // Respond to client immediately — don't make user wait for SMTP
+    res.json({ success: true, message: 'Mesajiniz alindi! En kisa surede size donecegiz.' });
+
+    // Send mail in background
+    const mailOptions = {
+        from: '"Ecemiko Iletisim" <ecemikolauncher@ecemikoapp.info>',
+        to: 'ecemikolly@gmail.com',
+        subject: `Ecemiko Site - Iletisim: ${name}`,
+        text: `Gonderen: ${name}\nE-posta: ${email}\n\nMesaj:\n${message}`,
+        html: `<h3>Yeni Mesaj</h3><p><b>Gonderen:</b> ${name}</p><p><b>E-posta:</b> ${email}</p><hr><p style="white-space:pre-wrap">${message}</p>`
+    };
+
+    mailTransporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+            console.error('[contact] Mail FAILED:', err.message, err.code);
+        } else {
+            console.log('[contact] Mail sent OK:', info.messageId);
+        }
+    });
 });
 
 

@@ -12,21 +12,13 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="style.css?v=16" />
+    <link rel="stylesheet" href="style.css?v=20" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 
 <body>
-    <!-- 
-      ===============================================================
-      🚨 HACKER DETECTED 🚨
-      Sen şimdi kaynak kodları inceleyip buradan bir şeyler 
-      çalabileceğini mi sandın? 
-      aptal olma user ol
-      Daha iyisini denemelisin, tüm arka kapılar kapandı. 😎
-      ===============================================================
-    -->
+
 
     <!-- Custom Cursor -->
     <div id="cursor-dot"></div>
@@ -110,21 +102,21 @@
             </div>
             <div class="hero-stats">
                 <div class="stat-item">
-                    <span class="stat-num" data-count="5">1</span>
-                    <span class="stat-plus">+</span>
-                    <span class="stat-label">Kullanıcı</span>
+                    <span class="stat-num" id="active-users-count" data-count="10">0</span>
+                    <span class="stat-plus" id="active-users-plus">Bin+</span>
+                    <span class="stat-label">Aktif Kullanıcı</span>
                 </div>
                 <div class="stat-divider"></div>
                 <div class="stat-item">
                     <span class="stat-num" data-count="64">0</span>
                     <span class="stat-plus">Bin+</span>
-                    <span class="stat-label">Oyun</span>
+                    <span class="stat-label">Oyun Desteği</span>
                 </div>
                 <div class="stat-divider"></div>
                 <div class="stat-item">
-                    <span class="stat-num" data-count="100">0</span>
-                    <span class="stat-plus">%</span>
-                    <span class="stat-label">Memnuniyet</span>
+                    <span class="stat-num" data-count="99">0</span>
+                    <span class="stat-plus">.9%</span>
+                    <span class="stat-label">Memnuniyet Oranı</span>
                 </div>
             </div>
         </div>
@@ -215,14 +207,14 @@
             <div class="faq-list">
                 <div class="faq-item">
                     <button class="faq-question">
-                        <span>Ecemiko'yu indirmek ücretli mi?</span>
+                        <span>Ecemiko'yu kullanmak ücretli mi?</span>
                         <div class="faq-icon">+</div>
                     </button>
                     <div class="faq-answer">
-                        <p>Evet! 🌸 Olabilecek en tatlı ve uygun fiyatla, herkes rahatça ulaşsın istedik!
-                            Uygulamamızı
-                            sitemizden indirip sana verdiğimiz o minik kodla hemen sihirli dünyaya adım atabilirsin! ✨💖
-                        </p>
+                        <p>Ecemiko Launcher, sunduğu gelişmiş özellikleri herkesin deneyimleyebilmesi için oldukça
+                            avantajlı ve bütçe dostu fiyatlandırma seçenekleriyle sunulmaktadır. Satın aldığınız paketle
+                            birlikte size iletilen lisans kodunu kullanarak launcher'ı anında aktif hale
+                            getirebilirsiniz.</p>
                     </div>
                 </div>
 
@@ -232,10 +224,9 @@
                         <div class="faq-icon">+</div>
                     </button>
                     <div class="faq-answer">
-                        <p>Windows 10 ve üzeri bir sistemin varsa hiç dert etme, tıkır tıkır çalışıyor! 🎀 Ecemiko,
-                            bilgisayarını asla yormayacak kadar minnoş ve hafif bir yapıyla tasarlandı. Sen sadece
-                            keyfini çıkar!
-                        </p>
+                        <p>Windows 10 ve Windows 11 işletim sistemlerinde kararlı bir şekilde çalışmaktadır. Launcher,
+                            sistem kaynaklarını minimum düzeyde tüketecek şekilde optimize edilmiştir, böylece oyun
+                            esnasında bilgisayarınızda herhangi bir performans kaybı yaşanmaz.</p>
                     </div>
                 </div>
 
@@ -245,12 +236,9 @@
                         <div class="faq-icon">+</div>
                     </button>
                     <div class="faq-answer">
-                        <p>Kesinlikle evet! Yeni bir sürüm geldiğinde değerli vaktini çalmamak için seni sıkmıyoruz.
-                            Kendi
-                            geliştirdiğimiz
-                            akıllı sistem sayesinde gelen sihirli ''Güncellemeyi İndir'' butonu ile, arka planda
-                            saniyeler içinde kendini güncelliyor!
-                            🪄✨</p>
+                        <p>Evet. Ecemiko Launcher, arka planda otomatik güncelleme kontrolü yapar. Yeni bir sürüm veya
+                            performans iyileştirmesi yayınlandığında, uygulama içerisinden tek tıkla saniyeler içinde
+                            güncel sürüme geçebilirsiniz.</p>
                     </div>
                 </div>
 
@@ -260,11 +248,9 @@
                         <div class="faq-icon">+</div>
                     </button>
                     <div class="faq-answer">
-                        <p>Bu konuda inanılmaz titiziz! 🔐 Tüm bağlantıların sıkı sıkıya şifreleniyor ve verilerini
-                            kimseciklerle
-                            paylaşmıyoruz! Sistemi adeta bir banka kasası gibi kilit altında tutuyoruz. Çünkü senin o
-                            güzel
-                            güvenliğin her şeyden önemli!</p>
+                        <p>Güvenlik bizim en hassas olduğumuz konudur. Launcher ile sunucularımız arasındaki tüm veri
+                            akışı endüstri standardı protokollerle şifrelenmektedir. Kişisel verileriniz asla üçüncü
+                            taraflarla paylaşılmaz ve yerel ayarlarınız güvenle saklanır.</p>
                     </div>
                 </div>
             </div>
@@ -806,7 +792,7 @@
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <script src="script.js?v=17"></script>
+    <script src="script.js?v=20"></script>
 </body>
 
 </html>

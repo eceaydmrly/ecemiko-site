@@ -266,14 +266,13 @@ const countObs = new IntersectionObserver(entries => {
         const el = e.target;
         const rawTarget = el.dataset.count;
 
-        // Eğer hedef rakam değilse (örn: "64 Bin") veya 1 gibi çok küçükse animasyona sokma
+        // Eğer hedef rakam değilse veya 1 gibi çok küçükse animasyona sokma
         if (isNaN(rawTarget) || parseInt(rawTarget) <= 1) {
             el.textContent = rawTarget;
             countObs.unobserve(el);
             return;
         }
 
-        const target = parseInt(rawTarget);
         const dur = 1800;
         const start = performance.now();
 
@@ -281,9 +280,15 @@ const countObs = new IntersectionObserver(entries => {
             const p = Math.min((now - start) / dur, 1);
             const eased = 1 - Math.pow(2, -10 * p);         // easeOutExpo
 
-            // Eğer hedef sayı çok küçükse (1 gibi) Math.floor 0'da bırakabiliyor.
-            // Küçük sayılarda Math.ceil kullanarak direkt rakama ulaşmasını sağlıyoruz.
-            const current = target < 10 ? Math.ceil(eased * target) : Math.floor(eased * target);
+            // Read the dataset.count dynamically at each frame so we catch backend updates
+            const currentTarget = parseInt(el.dataset.count) || 10;
+
+            let current;
+            if (p >= 1) {
+                current = currentTarget;
+            } else {
+                current = currentTarget < 10 ? Math.ceil(eased * currentTarget) : Math.floor(eased * currentTarget);
+            }
             el.textContent = current.toLocaleString('tr-TR');
 
             if (p < 1) requestAnimationFrame(tick);
@@ -553,22 +558,47 @@ function initFooterLogic() {
     contactClose?.addEventListener('click', closeContact);
     contactOverlay?.addEventListener('click', closeContact);
 
-    // Form submission simulation
-    contactForm?.addEventListener('submit', (e) => {
+    // Form submission using server API
+    contactForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitBtn = contactForm.querySelector('button');
         const originalText = submitBtn.textContent;
 
+        const nameInput = contactForm.querySelector('input[type="text"]');
+        const emailInput = contactForm.querySelector('input[type="email"]');
+        const messageInput = contactForm.querySelector('textarea');
+
         submitBtn.disabled = true;
         submitBtn.textContent = 'Gönderiliyor...';
 
-        setTimeout(() => {
-            alert('Mesajınız başarıyla iletildi! En kısa sürede size döneceğiz.');
+        try {
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: nameInput.value,
+                    email: emailInput.value,
+                    message: messageInput.value
+                })
+            });
+
+            const data = await response.json();
+            if (response.ok && data.success) {
+                alert('Mesajınız başarıyla iletildi! En kısa sürede size döneceğiz.');
+                contactForm.reset();
+                closeContact();
+            } else {
+                alert('Hata: ' + (data.message || 'Bilinmeyen bir hata oluştu.'));
+            }
+        } catch (error) {
+            console.error('Contact form submission error:', error);
+            alert('Bağlantı hatası! Mesajınız iletilemedi.');
+        } finally {
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
-            contactForm.reset();
-            closeContact();
-        }, 1500);
+        }
     });
 }
 
@@ -1170,6 +1200,38 @@ function initAuthLogic() {
 }
 
 
+async function fetchActiveUsers() {
+    try {
+        const response = await fetch('/api/active-users');
+        const data = await response.json();
+        if (data.success && typeof data.count === 'number') {
+            const count = data.count;
+            const countEl = document.getElementById('active-users-count');
+            const plusEl = document.getElementById('active-users-plus');
+            if (countEl && plusEl) {
+                if (count >= 1000) {
+                    const thousands = count / 1000;
+                    const formatted = thousands % 1 === 0 ? thousands.toFixed(0) : thousands.toFixed(1);
+                    countEl.dataset.count = formatted;
+                    plusEl.textContent = ' Bin+';
+                } else {
+                    countEl.dataset.count = count;
+                    plusEl.textContent = '+';
+                }
+                
+                // If the count-up animation has already completed (non-zero value in element),
+                // we should update it immediately.
+                if (countEl.textContent !== '0') {
+                    countEl.textContent = count >= 1000 ? (count / 1000).toFixed(1).replace('.', ',') : count;
+                }
+            }
+        }
+    } catch (e) {
+        console.error('Error fetching active users:', e);
+    }
+}
+
+
 /* ───────────────────────────────────────────────────────────
    Init
    ─────────────────────────────────────────────────────────── */
@@ -1179,3 +1241,4 @@ initLightbox();
 initFooterLogic();
 initDownloadEffect();
 initAuthLogic();
+fetchActiveUsers();
