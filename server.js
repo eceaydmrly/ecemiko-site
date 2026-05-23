@@ -11,6 +11,7 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 const port = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || 'ecemiko_default_secure_jwt_secret_key_2026';
 
 // Firebase SDK tamamen kaldirildi — REST API kullaniliyor (SDK persistent conn nodemailer'i blokluyor)
 // Firestore REST API config
@@ -74,7 +75,7 @@ const authenticateToken = (req, res, next) => {
 
     if (token == null) return res.sendStatus(401);
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) return res.sendStatus(403);
         req.user = user;
         next();
@@ -111,7 +112,7 @@ app.post('/api/verify-code', (req, res) => {
     usedCodes[cleanCode] = { userId: userId, usedAt: Date.now() };
 
     // 5. Generate Access Token (JWT)
-    const accessToken = jwt.sign({ userId: userId, role: 'premium' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const accessToken = jwt.sign({ userId: userId, role: 'premium' }, JWT_SECRET, { expiresIn: '24h' });
 
     res.json({ success: true, token: accessToken });
 });
