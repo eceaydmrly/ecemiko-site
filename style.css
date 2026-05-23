@@ -2047,7 +2047,10 @@ body.authenticated #user-profile.account-premium-pill.auth-required {
         grid-template-columns: 1fr;
     }
     
-    .story-panel {
+    .story-panel,
+    .story-panel--left,
+    .story-panel--right,
+    .story-panel--center {
         left: 5% !important;
         right: 5% !important;
         width: 90% !important;
@@ -2058,7 +2061,10 @@ body.authenticated #user-profile.account-premium-pill.auth-required {
         transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out) !important;
     }
     
-    .story-panel.visible {
+    .story-panel.visible,
+    .story-panel--left.visible,
+    .story-panel--right.visible,
+    .story-panel--center.visible {
         transform: translateY(0) translateX(0) !important;
     }
     
