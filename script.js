@@ -84,8 +84,8 @@ const ctx = canvas.getContext('2d');
 const section = document.getElementById('scroll-animation-section');
 
 // Restored the exact existing JPG sequence from the original codebase
-const TOTAL = 93;
-const frameSrc = n => `ezgif-821fab6a50df84fa-jpg/ezgif-frame-${String(n).padStart(3, '0')}.jpg`;
+const TOTAL = 86;
+const frameSrc = n => `ezgif-821fab6a50df84fa-jpg/Adsız tasarım (1)_${String(n - 1).padStart(3, '0')}.jpg`;
 
 const imgs = new Array(TOTAL);
 let curIdx = 0;
@@ -698,7 +698,7 @@ const validCodes = [
 
 // Console message for developers/snoopers
 console.log("%c🚨 DİKKAT 🚨", "color: red; font-size: 50px; font-weight: bold; text-shadow: 2px 2px 0 #000;");
-console.log("%cBurada bulabileceğin tek şey benim mükemmel kodlarım. Eski açıklar kapatıldı, boşa uğraşma defolll", "color: #E91E8C; font-size: 16px; font-weight: bold;");
+console.log("%cBurada bulabileceğin tek şey benim mükemmel kodlarım. Eski açıklar kapatıldı, boşa uğraşma defolll", "color: #8B5CF6; font-size: 16px; font-weight: bold;");
 
 // Troll localStorage
 localStorage.setItem('hacker_status', 'detected_calling_fbi_now...');

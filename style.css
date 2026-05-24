@@ -10,9 +10,9 @@
     --bg-card: #121215;       /* Zinc 900 */
     --bg-card-hover: #18181b; /* Zinc 800 */
     
-    --rose: #e11d48;          /* Rose 600 - Sophisticated Accent */
-    --rose-light: #fda4af;    /* Rose 300 */
-    --rose-dark: #9f1239;     /* Rose 800 */
+    --rose: #d946ef;          /* Electric Fuchsia (Pinkish-Purple) */
+    --rose-light: #f5d0fe;    /* Pastel Fuchsia */
+    --rose-dark: #701a75;     /* Deep Fuchsia/Plum */
     
     --indigo: #4f46e5;        /* Indigo 600 */
     --indigo-light: #818cf8;  /* Indigo 400 */
@@ -21,7 +21,7 @@
     /* Slate Borders */
     --border: rgba(255, 255, 255, 0.06);
     --border-hover: rgba(255, 255, 255, 0.12);
-    --border-rose: rgba(225, 29, 72, 0.25);
+    --border-rose: rgba(217, 70, 239, 0.25);
     --border-indigo: rgba(79, 70, 229, 0.25);
     
     /* Typography */
