@@ -231,62 +231,6 @@ app.post('/api/contact', (req, res) => {
 });
 
 
-// Dynamic Shopier Direct Payment URL Generation API
-app.post('/api/create-shopier-payment', (req, res) => {
-    try {
-        const { amount, productName, firstName, lastName, email, phone } = req.body;
-
-        if (!amount || !productName || !firstName || !lastName || !email || !phone) {
-            return res.status(400).json({ success: false, message: 'Lütfen tüm alıcı bilgilerini eksiksiz doldurun.' });
-        }
-
-        const { Shopier, Currency, Language } = require('@nopeion/shopier');
-
-        // Shopier credentials - Fallbacks to environment vars or user's active API keys
-        const shopierApiKey = process.env.SHOPIER_API_KEY || '76a048e538fc0d16d5a356ed13de7afc'; 
-        const shopierApiSecret = process.env.SHOPIER_API_SECRET || '8ac1825dcf3c4e42e46a2c35836bce30a6b274e5ffa35739f5cdd9faf08c89c1';
-
-        const shopier = new Shopier({
-            apiKey: shopierApiKey,
-            apiSecret: shopierApiSecret
-        });
-
-        // Unique dynamic platform order ID
-        const orderId = 'ECW-' + Math.floor(100000 + Math.random() * 900000);
-
-        const payment = shopier.createPayment({
-            amount: parseFloat(amount),
-            currency: Currency.TL,
-            language: Language.TR,
-            buyer: {
-                id: orderId,
-                firstName: firstName,
-                lastName: lastName,
-                email: email.trim(),
-                phone: phone.trim(),
-                productName: productName
-            },
-            billing: {
-                address: 'Ecemiko Dijital Teslimat Adresi',
-                city: 'Istanbul',
-                country: 'Turkiye',
-                postcode: '34000'
-            }
-        });
-
-        res.json({
-            success: true,
-            html: payment.html,
-            orderId: orderId
-        });
-
-    } catch (error) {
-        console.error('[Shopier API Error]:', error);
-        res.status(500).json({ success: false, message: error.message || 'Ödeme oturumu başlatılamadı.' });
-    }
-});
-
-
 app.listen(port, () => {
     console.log(`Ecemiko secure server running on port ${port}`);
 });
