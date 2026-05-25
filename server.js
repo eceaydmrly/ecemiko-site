@@ -242,9 +242,9 @@ app.post('/api/create-shopier-payment', (req, res) => {
 
         const { Shopier, Currency, Language } = require('@nopeion/shopier');
 
-        // Shopier credentials - Fallbacks to environment vars or dummy keys
-        const shopierApiKey = process.env.SHOPIER_API_KEY || 'AIzaSyADHMOGXr38ltWu6NLKG0qEagN9DQ2N3JI'; 
-        const shopierApiSecret = process.env.SHOPIER_API_SECRET || 'qcsh nkez jijs jcyw';
+        // Shopier credentials - Fallbacks to environment vars or user's active API keys
+        const shopierApiKey = process.env.SHOPIER_API_KEY || '76a048e538fc0d16d5a356ed13de7afc'; 
+        const shopierApiSecret = process.env.SHOPIER_API_SECRET || '8ac1825dcf3c4e42e46a2c35836bce30a6b274e5ffa35739f5cdd9faf08c89c1';
 
         const shopier = new Shopier({
             apiKey: shopierApiKey,
