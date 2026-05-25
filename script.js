@@ -1233,6 +1233,176 @@ async function fetchActiveUsers() {
 
 
 /* ───────────────────────────────────────────────────────────
+   15. SHOPIER IFRAME MODAL PAYMENT LOGIC
+   ─────────────────────────────────────────────────────────── */
+function initShopierPayment() {
+    const pricingButtons = document.querySelectorAll('.btn-pricing');
+    const shopierModal = document.getElementById('shopier-modal');
+    const shopierClose = document.getElementById('shopier-close');
+    const shopierOverlay = document.getElementById('shopier-overlay');
+    const shopierIframe = document.getElementById('shopier-iframe');
+    const shopierLoading = document.getElementById('shopier-loading');
+    const shopierHeader = document.querySelector('.shopier-header');
+
+    if (!shopierModal || !shopierIframe || !shopierLoading) return;
+
+    let selectedPackage = {
+        name: 'Ecemiko 1 Aylık Paket',
+        amount: 400
+    };
+
+    async function startShopierPayment(btn) {
+        shopierModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Determine package name and price dynamically
+        const isPremium = btn.classList.contains('btn-pricing-premium');
+        if (isPremium) {
+            selectedPackage = {
+                name: 'Ecemiko Sınırsız Paket',
+                amount: 2000
+            };
+        } else {
+            selectedPackage = {
+                name: 'Ecemiko 1 Aylık Paket',
+                amount: 400
+            };
+        }
+
+        // Show header and start neon loading state
+        if (shopierHeader) shopierHeader.style.display = 'block';
+        shopierIframe.src = '';
+        shopierIframe.classList.remove('loaded');
+        shopierLoading.classList.remove('fade-out');
+
+        // Extract logged in user details or fallback to premium safe defaults
+        let firstName = 'Ecemiko';
+        let lastName = 'Musterisi';
+        let email = 'destek@ecemikoapp.info';
+        let phone = '5555555555';
+
+        try {
+            if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+                const user = firebase.auth().currentUser;
+                email = user.email || email;
+                if (user.displayName) {
+                    const names = user.displayName.trim().split(/\s+/);
+                    firstName = names[0] || firstName;
+                    lastName = names.slice(1).join(' ') || lastName;
+                }
+            }
+        } catch (e) {
+            console.warn('[Shopier Auth prefill fail]:', e);
+        }
+
+        try {
+            // Hit backend secure signing API
+            const response = await fetch('/api/create-shopier-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    amount: selectedPackage.amount,
+                    productName: selectedPackage.name,
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    phone: phone
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.html) {
+                // Hide header for maximum iframe space and focus
+                if (shopierHeader) shopierHeader.style.display = 'none';
+
+                // Write the dynamic self-submitting payment form inside the iframe
+                const iframeDoc = shopierIframe.contentWindow.document;
+                iframeDoc.open();
+                iframeDoc.write(data.html);
+                iframeDoc.close();
+            } else {
+                alert(data.message || 'Ödeme oturumu başlatılamadı. Lütfen tekrar deneyin.');
+                closeShopierPayment();
+            }
+        } catch (err) {
+            console.error('[Shopier session start error]:', err);
+            alert('Ödeme sunucusuyla bağlantı kurulamadı. Lütfen internetinizi kontrol edip tekrar deneyin.');
+            closeShopierPayment();
+        }
+    }
+
+    function closeShopierPayment() {
+        shopierModal.classList.remove('active');
+        document.body.style.overflow = '';
+        shopierIframe.src = '';
+        shopierIframe.classList.remove('loaded');
+        shopierLoading.classList.remove('fade-out');
+    }
+
+    // Intercept checkout clicks
+    pricingButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const url = this.getAttribute('href');
+            if (url && url.includes('shopier.com')) {
+                e.preventDefault();
+                startShopierPayment(this);
+            }
+        });
+    });
+
+    // Handle Iframe Load complete
+    shopierIframe.addEventListener('load', () => {
+        try {
+            const iframeSrc = shopierIframe.contentWindow.location.href;
+            if (iframeSrc && iframeSrc !== 'about:blank') {
+                setTimeout(() => {
+                    shopierLoading.classList.add('fade-out');
+                    shopierIframe.classList.add('loaded');
+                }, 400);
+            }
+        } catch (err) {
+            // Safe cross-origin loaded indicator
+            setTimeout(() => {
+                shopierLoading.classList.add('fade-out');
+                shopierIframe.classList.add('loaded');
+            }, 400);
+        }
+    });
+
+    // Close Modal Events
+    shopierClose.addEventListener('click', closeShopierPayment);
+    shopierOverlay.addEventListener('click', closeShopierPayment);
+
+    // Escape Key Support
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && shopierModal.classList.contains('active')) {
+            closeShopierPayment();
+        }
+    });
+
+    // Process Management (postMessage Listener for Payment Completion)
+    window.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'shopier-payment') {
+            if (event.data.status === 'success') {
+                closeShopierPayment();
+                alert('Ödemeniz başarıyla alındı! Keyfiniz bol olsun. Erişim kodunuz e-posta adresinize gönderildi.');
+                setTimeout(() => {
+                    const authModal = document.getElementById('auth-modal');
+                    if (authModal) authModal.classList.add('active');
+                }, 1000);
+            } else if (event.data.status === 'fail') {
+                alert('Ödeme tamamlanamadı veya iptal edildi. Lütfen tekrar deneyin.');
+                closeShopierPayment();
+            }
+        }
+    });
+}
+
+
+/* ───────────────────────────────────────────────────────────
    Init
    ─────────────────────────────────────────────────────────── */
 handleScrollReveal();
@@ -1242,3 +1412,5 @@ initFooterLogic();
 initDownloadEffect();
 initAuthLogic();
 fetchActiveUsers();
+initShopierPayment();
+
