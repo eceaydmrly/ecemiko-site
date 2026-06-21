@@ -298,7 +298,32 @@ const countObs = new IntersectionObserver(entries => {
     });
 }, { threshold: 0.5 });
 
-document.querySelectorAll('.stat-num').forEach(el => countObs.observe(el));
+// Fetch active users dynamically and trigger counting animation
+async function initHeroStats() {
+    try {
+        const res = await fetch('/api/active-users');
+        const data = await res.json();
+        if (data.success && typeof data.count === 'number') {
+            const countEl = document.getElementById('active-users-count');
+            const plusEl = document.getElementById('active-users-plus');
+            if (countEl && plusEl) {
+                const count = data.count;
+                if (count >= 1000) {
+                    countEl.dataset.count = Math.floor(count / 1000);
+                    plusEl.textContent = 'Bin+';
+                } else {
+                    countEl.dataset.count = count;
+                    plusEl.textContent = '+';
+                }
+            }
+        }
+    } catch (err) {
+        console.error('Error fetching active users count:', err);
+    } finally {
+        document.querySelectorAll('.stat-num').forEach(el => countObs.observe(el));
+    }
+}
+initHeroStats();
 
 
 /* ───────────────────────────────────────────────────────────
