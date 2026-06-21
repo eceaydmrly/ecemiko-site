@@ -1,7 +1,8 @@
+require('dotenv').config();
 const axios = require('axios');
 
-const FIRESTORE_PROJECT = 'ecemikouygulamakeysistemi';
-const FIRESTORE_API_KEY = 'AIzaSyADHMOGXr38ltWu6NLKG0qEagN9DQ2N3JI';
+const FIRESTORE_PROJECT = process.env.FIRESTORE_PROJECT;
+const FIRESTORE_API_KEY = process.env.FIRESTORE_API_KEY;
 
 async function testQuery() {
     try {

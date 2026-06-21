@@ -11,22 +11,30 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 const port = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'ecemiko_default_secure_jwt_secret_key_2026';
 
-// Firebase SDK tamamen kaldirildi — REST API kullaniliyor (SDK persistent conn nodemailer'i blokluyor)
-// Firestore REST API config
-const FIRESTORE_PROJECT = 'ecemikouygulamakeysistemi';
-const FIRESTORE_API_KEY = 'AIzaSyADHMOGXr38ltWu6NLKG0qEagN9DQ2N3JI';
+// Env-only configurations for maximum security
+const JWT_SECRET = process.env.JWT_SECRET;
+const FIRESTORE_PROJECT = process.env.FIRESTORE_PROJECT;
+const FIRESTORE_API_KEY = process.env.FIRESTORE_API_KEY;
 
-// Nodemailer transporter - startup'ta bir kere olustur, her requestte yeniden kurma
+if (!JWT_SECRET || !FIRESTORE_PROJECT || !FIRESTORE_API_KEY) {
+    console.warn("WARNING: Critical environment variables (JWT_SECRET, FIRESTORE_PROJECT, FIRESTORE_API_KEY) are missing! Please check your .env file or Vercel dashboard.");
+}
+
+// Global cache for GitHub release URL to prevent rate-limiting (lasts 5 minutes)
+let cachedReleaseUrl = null;
+let releaseCacheExpiry = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// Nodemailer transporter configured securely via environment variables
 const mailTransporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT) || 587,
     secure: false,
     pool: false,
     auth: {
-        user: process.env.SMTP_USER || 'ecemikolauncher@ecemikoapp.info',
-        pass: process.env.SMTP_PASS || 'qcsh nkez jijs jcyw'
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
     },
     tls: {
         rejectUnauthorized: false
@@ -36,11 +44,18 @@ const mailTransporter = nodemailer.createTransport({
     socketTimeout: 15000
 });
 
+// Security headers middleware
+app.use((req, res, next) => {
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Referrer-Policy', 'no-referrer-when-downgrade');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    next();
+});
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
-
-// Rate Limiting could be added here for production
 
 
 
@@ -170,20 +185,44 @@ app.get(['/.env', '/wp-admin', '/wp-login.php', '/config.php', '/Lucy V2.0.0.exe
 });
 
 // Protected Download Route
-app.get('/api/download-app', authenticateToken, (req, res) => {
+app.get('/api/download-app', authenticateToken, async (req, res) => {
     // Only users with a valid JWT (which means they verified a code) can reach here
 
     if (req.user.role !== 'premium') {
         return res.status(403).json({ success: false, message: 'Bunun için yetkiniz yok.' });
     }
 
-    // Path to the actual exe file. This file MUST NOT be in the 'public' folder anymore.
-    const file = path.join(__dirname, 'secure_downloads', 'Lucy V2.0.0.exe');
+    const now = Date.now();
+    if (cachedReleaseUrl && now < releaseCacheExpiry) {
+        return res.json({ success: true, url: cachedReleaseUrl });
+    }
 
-    if (fs.existsSync(file)) {
-        res.download(file); // Serve the file for download
-    } else {
-        res.status(404).json({ success: false, message: 'Dosya bulunamadı.' });
+    try {
+        // Fetch the latest release info from the GitHub repository
+        const response = await axios.get('https://api.github.com/repos/sovmeyingo/Lucy-Updates/releases/latest', {
+            headers: {
+                'User-Agent': 'Ecemiko-Server'
+            }
+        });
+        
+        const data = response.data;
+        const exeAsset = data.assets.find(asset => asset.name.endsWith('.exe'));
+        
+        if (exeAsset && exeAsset.browser_download_url) {
+            cachedReleaseUrl = exeAsset.browser_download_url;
+            releaseCacheExpiry = now + CACHE_DURATION;
+            return res.json({ success: true, url: cachedReleaseUrl });
+        }
+        
+        return res.status(404).json({ success: false, message: 'İndirme dosyası bulunamadı.' });
+    } catch (error) {
+        console.error('Error fetching latest release for download:', error.message);
+        // Fallback to latest known release URL if GitHub API fails
+        const fallbackUrl = 'https://github.com/sovmeyingo/Lucy-Updates/releases/download/v87.0.0/Ecemiko.V87.0.0.exe';
+        return res.json({ 
+            success: true, 
+            url: fallbackUrl 
+        });
     }
 });
 

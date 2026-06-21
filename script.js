@@ -642,22 +642,30 @@ function initDownloadEffect() {
                     });
 
                     if (response.ok) {
-                        // Parse the blob to make the browser download it without navigating away
-                        const blob = await response.blob();
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.style.display = 'none';
-                        a.href = url;
-                        // Extract filename from Content-Disposition if available, or just use default
-                        a.download = 'Lucy V2.0.0.exe';
-                        document.body.appendChild(a);
-                        a.click();
-                        window.URL.revokeObjectURL(url);
+                        const data = await response.json();
+                        if (data.success && data.url) {
+                            // Direct download via link redirection to bypass Vercel limits and browser CORS/memory limits
+                            const a = document.createElement('a');
+                            a.style.display = 'none';
+                            a.href = data.url;
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                        } else {
+                            alert("İndirme Hatası: " + (data.message || "Bilinmeyen bir hata oluştu"));
+                        }
                     } else {
-                        const errData = await response.json();
-                        alert("İndirme Hatası: " + (errData.message || "Bilinmeyen bir hata oluştu"));
+                        let errMsg = "Bilinmeyen bir hata oluştu";
+                        try {
+                            const errData = await response.json();
+                            errMsg = errData.message || errMsg;
+                        } catch (jsonErr) {
+                            errMsg = `Sunucu hatası (${response.status})`;
+                        }
+                        alert("İndirme Hatası: " + errMsg);
                     }
                 } catch (error) {
+                    console.error("Download error:", error);
                     alert("Bağlantı Hatası!");
                 }
             } else {
