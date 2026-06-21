@@ -230,7 +230,16 @@ app.get('/api/active-users', async (req, res) => {
         const body = {
             structuredAggregationQuery: {
                 aggregations: [{ alias: 'count', count: {} }],
-                structuredQuery: { from: [{ collectionId: 'accounts' }] }
+                structuredQuery: {
+                    from: [{ collectionId: 'accounts' }],
+                    where: {
+                        fieldFilter: {
+                            field: { fieldPath: 'usedBy' },
+                            op: 'GREATER_THAN_OR_EQUAL',
+                            value: { stringValue: '' }
+                        }
+                    }
+                }
             }
         };
         const response = await axios.post(url, body, { timeout: 8000 });
