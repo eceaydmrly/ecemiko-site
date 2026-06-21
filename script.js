@@ -611,6 +611,7 @@ function initDownloadEffect() {
     if (!dlBtn) return;
 
     dlBtn.addEventListener('click', function (e) {
+        e.preventDefault();
         // İndirme işlemini simüle etmek için 2 saniye bekletiyoruz
         if (this.classList.contains('loading')) return;
 
