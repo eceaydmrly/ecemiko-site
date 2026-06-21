@@ -12,29 +12,25 @@ const nodemailer = require('nodemailer');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Env-only configurations for maximum security
-const JWT_SECRET = process.env.JWT_SECRET;
-const FIRESTORE_PROJECT = process.env.FIRESTORE_PROJECT;
-const FIRESTORE_API_KEY = process.env.FIRESTORE_API_KEY;
-
-if (!JWT_SECRET || !FIRESTORE_PROJECT || !FIRESTORE_API_KEY) {
-    console.warn("WARNING: Critical environment variables (JWT_SECRET, FIRESTORE_PROJECT, FIRESTORE_API_KEY) are missing! Please check your .env file or Vercel dashboard.");
-}
+// Configurations with fallback values for backward compatibility and zero-config deployment
+const JWT_SECRET = process.env.JWT_SECRET || 'ecemiko_default_secure_jwt_secret_key_2026';
+const FIRESTORE_PROJECT = process.env.FIRESTORE_PROJECT || 'ecemikouygulamakeysistemi';
+const FIRESTORE_API_KEY = process.env.FIRESTORE_API_KEY || 'AIzaSyADHMOGXr38ltWu6NLKG0qEagN9DQ2N3JI';
 
 // Global cache for GitHub release URL to prevent rate-limiting (lasts 5 minutes)
 let cachedReleaseUrl = null;
 let releaseCacheExpiry = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-// Nodemailer transporter configured securely via environment variables
+// Nodemailer transporter configured securely via environment variables or fallbacks
 const mailTransporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT) || 587,
     secure: false,
     pool: false,
     auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
+        user: process.env.SMTP_USER || 'ecemikolauncher@ecemikoapp.info',
+        pass: process.env.SMTP_PASS || 'qcsh nkez jijs jcyw'
     },
     tls: {
         rejectUnauthorized: false

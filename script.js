@@ -987,8 +987,7 @@ function initAuthLogic() {
                 navEnterCode.classList.add('hidden-auth');
             } else {
                 document.body.classList.remove('authenticated');
-                navDownloadBtn.classList.remove('hidden-auth');
-                navDownloadBtn.textContent = 'Kodu Gir';
+                navDownloadBtn.classList.add('hidden-auth');
                 navEnterCode.classList.remove('hidden-auth');
             }
         } else {

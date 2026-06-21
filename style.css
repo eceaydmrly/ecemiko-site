@@ -2177,3 +2177,22 @@ body.authenticated #user-profile.account-premium-pill.auth-required {
     transform: scale(0.97);
 }
 
+/* Hide download section and links by default */
+#download,
+.auth-dynamic-btn {
+    display: none !important;
+}
+
+/* Show download section and links only for premium-authenticated accounts */
+body.authenticated #download {
+    display: block !important;
+}
+
+body.authenticated .auth-dynamic-btn {
+    display: inline-block !important;
+}
+
+body.authenticated a.auth-dynamic-btn {
+    display: inline-flex !important;
+}
+
