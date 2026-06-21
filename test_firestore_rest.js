@@ -14,7 +14,7 @@ async function testQuery() {
                     from: [{ collectionId: 'accounts' }],
                     where: {
                         fieldFilter: {
-                            field: { fieldPath: 'usedBy' },
+                            field: { fieldPath: 'email' },
                             op: 'GREATER_THAN_OR_EQUAL',
                             value: { stringValue: '' }
                         }
